@@ -1,6 +1,5 @@
 package minispark;
 
-import javafx.util.Pair;
 import minispark.Common.DependencyType;
 import minispark.Common.OperationType;
 
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 interface Function {
-  Pair<String, String> mapFunc(String Key);
+
 }
 
 public class Rdd {
