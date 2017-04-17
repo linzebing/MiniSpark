@@ -4,6 +4,9 @@ import javafx.util.Pair;
 import minispark.Common.DependencyType;
 import minispark.Common.OperationType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 interface Function {
   Pair<String, String> mapFunc(String Key);
 }
@@ -13,7 +16,6 @@ public class Rdd {
 
   public SparkContext sparkContext;
 
-  public boolean isTarget;
   public boolean cacheHint;
 
   public DependencyType dependencyType; // Wide or Narrow
@@ -22,9 +24,10 @@ public class Rdd {
   public int numPartitions; // Number of Partitions
   public Object lock;
   public Function function;
+  public ArrayList<ArrayList<String>> hdfsSplitInfo;
 
 
-  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function) {
+  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function, ArrayList<ArrayList<String>> _hdfsSplitInfo) {
     this.sparkContext = _sparkContext;
     this.dependencyType = _dependencyType;
     this.operationType = _operationType;
@@ -32,8 +35,8 @@ public class Rdd {
     this.numPartitions = _numPartitions;
     this.lock = new Object();
     this.function = _function;
+    this.hdfsSplitInfo = _hdfsSplitInfo;
 
-    this.isTarget = false;
     this.cacheHint = false;
   }
 
@@ -41,28 +44,28 @@ public class Rdd {
 
   }
 
-  public Rdd Cache() {
+  public Rdd cache() {
     this.cacheHint = true;
     return this;
   }
 
-  public Rdd Map(Function _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function);
+  public Rdd map(Function _function) {
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo);
   }
 
-  public Rdd FlatMap(Function _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function);
+  public Rdd flatMap(Function _function) {
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo);
   }
 
-  public Rdd Count() {
+  public Rdd count() {
     return new Rdd();
   }
 
-  public Rdd Reduce() {
+  public Rdd reduce() {
     return new Rdd();
   }
 
-  public Rdd Collect() {
-    return new Rdd();
+  public List<String> collect() {
+    return null;
   }
 }

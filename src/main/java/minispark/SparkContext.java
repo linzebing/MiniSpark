@@ -1,5 +1,7 @@
 package minispark;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -17,9 +19,10 @@ public class SparkContext {
     this.startTime = new Date();
   }
 
-  public Rdd textFile() {
-    Rdd rdd = new Rdd();
-    rdd.sparkContext = this;
+  public Rdd textFile(String hdfsAddr) throws IOException {
+    ArrayList<ArrayList<String>> hdfsSplitInfo = HdfsSplitReader.HdfsGetSplitInfo(hdfsAddr);
+    Rdd rdd = new Rdd(this, Common.DependencyType.Narrow, Common.OperationType.HdfsFile, null, hdfsSplitInfo.size(), null, hdfsSplitInfo);
+
     return rdd;
   }
 
