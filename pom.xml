@@ -76,9 +76,17 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <minimizeJar>false</minimizeJar>
-                            <finalName>Ngram</finalName>
-                        </configuration>
+                        <transformers>
+                            <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <manifestEntries>
+                                    <Main-Class>minispark.App</Main-Class>
+                                </manifestEntries>
+                            </transformer>
+                        </transformers>
+                        <artifactSet/>
+                        <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-fat.jar</outputFile>
+                    </configuration>
                     </execution>
                 </executions>
             </plugin>

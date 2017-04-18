@@ -3,7 +3,7 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
-        <entry key="active-configuration" value="PROJECT_RELATIVE:/Users/lzb/Desktop/google_checks.xml:GG" />
+        <entry key="active-configuration" value="PROJECT_RELATIVE:$PRJ_DIR$/../../google_checks.xml:GG" />
         <entry key="location-0" value="HTTP_URL:https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml:Google checkstyle" />
         <entry key="location-1" value="CLASSPATH:/sun_checks.xml:The default Checkstyle rules" />
         <entry key="location-2" value="PROJECT_RELATIVE:/Users/lzb/Desktop/google_checks.xml:GG" />
