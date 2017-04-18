@@ -36,6 +36,6 @@ public class HdfsSplitReader {
   }
 
   public static void main(String[] args) throws IOException {
-    HdfsGetSplitInfo("hdfs:///test.txt");
+    HdfsGetSplitInfo("webhdfs://ec2-34-205-85-106.compute-1.amazonaws.com/test.txt");
   }
 }
