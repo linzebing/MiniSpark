@@ -3,8 +3,6 @@ package minispark;
 import minispark.Common.OperationType;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Created by lzb on 4/8/17.
@@ -23,6 +21,7 @@ public class Scheduler {
       case HdfsFile:
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
         for (String addressHdfs: serverList) {
+          System.out.println(addressHdfs);
 
         }
         break;
@@ -45,8 +44,9 @@ public class Scheduler {
     // TODO: deal with WIDE dependency here
     if (targetRdd.dependencyType != Common.DependencyType.Wide) {
       if (targetRdd.parentRdd != null) {
-        runPartition(targetRdd.parentRdd, index);
+        runPartitionRecursively(targetRdd.parentRdd, index);
       }
+      runPartition(targetRdd, index);
     }
   }
 
@@ -78,7 +78,10 @@ public class Scheduler {
     int numPartitions = rdd.numPartitions;
     computeRddByStage(rdd);
     switch (operationType) {
-
+      case Collect:
+        break;
+      case Reduce:
+        break;
     }
 
 

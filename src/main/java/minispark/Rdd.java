@@ -24,9 +24,10 @@ public class Rdd {
   public Object lock;
   public Function function;
   public ArrayList<ArrayList<String>> hdfsSplitInfo;
+  public String filePath;
 
 
-  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function, ArrayList<ArrayList<String>> _hdfsSplitInfo) {
+  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath) {
     this.sparkContext = _sparkContext;
     this.dependencyType = _dependencyType;
     this.operationType = _operationType;
@@ -35,6 +36,7 @@ public class Rdd {
     this.lock = new Object();
     this.function = _function;
     this.hdfsSplitInfo = _hdfsSplitInfo;
+    this.filePath = _filePath;
 
     this.cacheHint = false;
   }
@@ -49,11 +51,11 @@ public class Rdd {
   }
 
   public Rdd map(Function _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo);
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
   }
 
   public Rdd flatMap(Function _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo);
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
   }
 
   public Rdd count() {
@@ -65,6 +67,7 @@ public class Rdd {
   }
 
   public List<String> collect() {
+    this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
     return null;
   }
 }
