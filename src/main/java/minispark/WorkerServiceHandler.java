@@ -15,7 +15,8 @@ import java.util.HashMap;
 public class WorkerServiceHandler implements WorkerService.Iface {
   public static HashMap<Integer, Object> hashMap = new HashMap<Integer, Object>();
 
-  public void doJob(DoJobArgs args, DoJobReply reply) {
+  public DoJobReply doJob(DoJobArgs args) {
+    DoJobReply reply = new DoJobReply();
     switch (args.workerOpType) {
       case GetSplit:
         if (hashMap.containsKey(args.partitionId)) {
@@ -28,7 +29,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
       case ReadHdfsSplit:
         if (hashMap.containsKey(args.partitionId)) {
           // Already in memory
-          return;
         } else {
           try {
             hashMap.put(args.partitionId, HdfsSplitReader.HdfsSplitRead(args.filePath, args.hdfsSplitId));
@@ -38,5 +38,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
     }
+    return reply;
   }
 }

@@ -25,14 +25,12 @@ public class Scheduler {
         assert(partition.hostName.equals(""));
 
         DoJobArgs args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, index, targetRdd.filePath);
-        DoJobReply reply = new DoJobReply();
 
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
 
         // TODO: should pick a random server here
-        this.master.assignJob(serverList.get(0), args, reply);
-        //targetRdd.partitions.get(index).hostName = serverList.get(0);
-        targetRdd.partitions.get(index).hostName = "ec2-34-205-29-215.compute-1.amazonaws.com";
+        DoJobReply reply = this.master.assignJob(serverList.get(0), args);
+        targetRdd.partitions.get(index).hostName = serverList.get(0);
         break;
       case Map:
 
@@ -91,10 +89,8 @@ public class Scheduler {
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
           DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, "");
-          DoJobReply reply = new DoJobReply();
-          reply.lines = new ArrayList<String>();
 
-          this.master.assignJob(partition.hostName, args, reply);
+          DoJobReply reply = this.master.assignJob(partition.hostName, args);
           result.addAll(reply.lines);
         }
         return result;

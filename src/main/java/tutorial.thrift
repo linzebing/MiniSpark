@@ -161,7 +161,7 @@ struct DoJobReply {
 }
 
 service WorkerService {
-    void doJob(1:DoJobArgs jobArgs, 2:DoJobReply jobReply)
+    DoJobReply doJob(1:DoJobArgs jobArgs)
 }
 
 

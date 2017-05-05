@@ -35,9 +35,11 @@ public class Master {
     }
   }
 
-  public void assignJob(String hostName, DoJobArgs args,  DoJobReply reply) throws TException {
+  public DoJobReply assignJob(String hostName, DoJobArgs args) throws TException {
     System.out.println(args.toString());
+    DoJobReply reply = client.doJob(args);
     System.out.println(reply.toString());
-    client.doJob(args, reply);
+
+    return reply;
   }
 }
