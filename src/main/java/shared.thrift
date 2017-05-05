@@ -23,7 +23,6 @@
  */
 
 namespace cpp shared
-
 namespace java shared
 namespace perl shared
 namespace php shared

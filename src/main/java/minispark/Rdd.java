@@ -6,8 +6,21 @@ import minispark.Common.OperationType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static minispark.Common.getPartitionID;
+
 interface Function {
 
+}
+
+class Partition {
+
+  // Different from partitionIndex. partitionId uniquely identifies a partition on the worker node
+  public int partitionId;
+  public String hostName;
+  public Partition(int _partitionId, String _hostName) {
+    this.partitionId = _partitionId;
+    this.hostName = _hostName;
+  }
 }
 
 public class Rdd {
@@ -23,9 +36,19 @@ public class Rdd {
   public int numPartitions; // Number of Partitions
   public Object lock;
   public Function function;
+
+  /*
+    Blocks are physical division and input splits are logical division.
+    One input split can be map to multiple physical blocks.
+    When Hadoop submits jobs, it splits the input data logically and process by each Mapper task.
+   */
   public ArrayList<ArrayList<String>> hdfsSplitInfo;
   public String filePath;
 
+  /*
+    By default, RDD is partitioned into numPartions (number of splits in HDFS)
+   */
+  public ArrayList<Partition> partitions;
 
   public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath) {
     this.sparkContext = _sparkContext;
@@ -38,11 +61,11 @@ public class Rdd {
     this.hdfsSplitInfo = _hdfsSplitInfo;
     this.filePath = _filePath;
 
+    for (int i = 0; i < this.numPartitions; ++i) {
+      partitions.add(new Partition(getPartitionID(), ""));
+    }
+
     this.cacheHint = false;
-  }
-
-  public Rdd() {
-
   }
 
   public Rdd cache() {
@@ -59,15 +82,14 @@ public class Rdd {
   }
 
   public Rdd count() {
-    return new Rdd();
+    return this;
   }
 
   public Rdd reduce() {
-    return new Rdd();
+    return this;
   }
 
-  public List<String> collect() {
-    this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
-    return null;
+  public ArrayList<String> collect() {
+    return (ArrayList<String>) this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
   }
 }

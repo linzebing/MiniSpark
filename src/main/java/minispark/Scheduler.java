@@ -1,7 +1,6 @@
 package minispark;
 
-import minispark.Common.OperationType;
-
+import minispark.Common.*;
 import java.util.ArrayList;
 
 /**
@@ -19,11 +18,17 @@ public class Scheduler {
   public void runPartition(Rdd targetRdd, int index) {
     switch (targetRdd.operationType) {
       case HdfsFile:
-        ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
-        for (String addressHdfs: serverList) {
-          System.out.println(addressHdfs);
+        Partition partition = targetRdd.partitions.get(index);
+        assert(partition.hostName.equals(""));
 
-        }
+        DoJobArgs args = new DoJobArgs(WorkerOpType.ReadHDFSSplit, partition.partitionId, index, targetRdd.filePath);
+        DoJobReply reply = new DoJobReply();
+
+        ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
+
+        // TODO: should pick a random server here
+        this.master.assignJob(serverList.get(0), args, reply);
+        targetRdd.partitions.get(index).hostName = serverList.get(0);
         break;
       case Map:
 
@@ -74,17 +79,25 @@ public class Scheduler {
     runRddInStage(targetRdd);
   }
 
-  public Rdd computeRdd(Rdd rdd, OperationType operationType, Function function) {
-    int numPartitions = rdd.numPartitions;
+  public Object computeRdd(Rdd rdd, OperationType operationType, Function function) {
     computeRddByStage(rdd);
     switch (operationType) {
       case Collect:
-        break;
+        ArrayList<String> result = new ArrayList<String>();
+        for (int i = 0; i < rdd.numPartitions; ++i) {
+          Partition partition = rdd.partitions.get(i);
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId);
+          DoJobReply reply = new DoJobReply();
+
+          this.master.assignJob(partition.hostName, args, reply);
+          result.addAll(reply.lines);
+        }
+        return result;
       case Reduce:
         break;
     }
 
 
-    return new Rdd();
+    return rdd;
   }
 }

@@ -1,5 +1,7 @@
 package minispark;
 
+import java.util.ArrayList;
+
 /**
  * Created by lzb on 4/8/17.
  */
@@ -7,6 +9,9 @@ package minispark;
 
 
 public class Common {
+
+  public static int counter = 0;
+
   public enum DependencyType {
     Wide, Narrow
   }
@@ -15,17 +20,37 @@ public class Common {
     Map, FlatMap, Reduce, ReduceByKey, Filter, Collect, HdfsFile
   }
 
-  /*
-  class DoJobArgs {
-    public OperationType operationType;
-    public String hdfsFile;
-    public int hdfsSplitId;
+  public enum WorkerOpType {
+    ReadHDFSSplit, GetSplit, DelSplit
+  }
 
-    public DoJobArgs(OperationType _operationType, String _hdfsFile, int _hdfsSplitId) {
-      this.operationType = _operationType;
-      this.hdfsFile = _hdfsFile;
-      this.hdfsSplitId = _hdfsSplitId;
+  static class DoJobReply {
+    public ArrayList<String> lines;
+
+    public DoJobReply() {
+
     }
   }
-  */
+
+  static class DoJobArgs {
+    public WorkerOpType workerOpType;
+    public int partitionId;
+    public int hdfsSplitId;
+    public String filePath;
+
+    public DoJobArgs(WorkerOpType _workerOpType, int _partitionId) {
+      this.workerOpType = _workerOpType;
+      this.partitionId = _partitionId;
+    }
+
+    public DoJobArgs(WorkerOpType _workerOpType, int _partitionId, int _hdfsSplitId, String _filePath) {
+      this(_workerOpType, _partitionId);
+      this.hdfsSplitId = _hdfsSplitId;
+      this.filePath = _filePath;
+    }
+  }
+
+  public static int getPartitionID() {
+    return counter++;
+  }
 }

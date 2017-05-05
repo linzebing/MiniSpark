@@ -32,7 +32,7 @@ public class HdfsSplitReader {
     return result;
   }
 
-  public static void HdfsSplitRead(String fileName, int index) throws IOException {
+  public static ArrayList<String> HdfsSplitRead(String fileName, int index) throws IOException {
     JobConf conf = new JobConf();
     FileSystem fs = FileSystem.get(conf);
     FileInputFormat.setInputPaths(conf, fileName);
@@ -44,9 +44,13 @@ public class HdfsSplitReader {
     RecordReader<LongWritable, Text> recordReader =
         format.getRecordReader(splits[index], conf, Reporter.NULL);
 
+    ArrayList<String> result = new ArrayList<String>();
+
     while (recordReader.next(key, value)) {
       System.out.println(value.toString());
+      result.add(value.toString());
     }
+    return result;
   }
 
   public static void main(String[] args) throws IOException {
