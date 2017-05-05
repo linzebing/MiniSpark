@@ -57,7 +57,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
             ArrayList<String> output = new ArrayList<>();
             for (String str: input) {
-              output.add((String) method.invoke(null, input));
+              output.add((String) method.invoke(null, str));
             }
           } catch (Exception e) {
             e.printStackTrace();
