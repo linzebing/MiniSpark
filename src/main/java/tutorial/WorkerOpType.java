@@ -14,7 +14,13 @@ import org.apache.thrift.TEnum;
 public enum WorkerOpType implements org.apache.thrift.TEnum {
   ReadHdfsSplit(1),
   GetSplit(2),
-  DelSplit(3);
+  DelSplit(3),
+  MapJob(4),
+  FlatMapJob(5),
+  FilterJob(6),
+  ReduceJob(7),
+  ReduceByKeyJob(8),
+  CountJob(9);
 
   private final int value;
 
@@ -41,6 +47,18 @@ public enum WorkerOpType implements org.apache.thrift.TEnum {
         return GetSplit;
       case 3:
         return DelSplit;
+      case 4:
+        return MapJob;
+      case 5:
+        return FlatMapJob;
+      case 6:
+        return FilterJob;
+      case 7:
+        return ReduceJob;
+      case 8:
+        return ReduceByKeyJob;
+      case 9:
+        return CountJob;
       default:
         return null;
     }

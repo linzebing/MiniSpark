@@ -22,19 +22,6 @@ import tutorial.WorkerService;
  */
 public class Worker {
 
-  /*
-  System.out.println(mapTest("s"));
-    try {
-    Method method = App.class.getMethod("mapTest", String.class);
-    method.invoke(null, "s");
-  } catch (Exception e) {
-    e.printStackTrace();
-  }*/
-
-  public static String mapTest(String s) {
-    return s + s;
-  }
-
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
 

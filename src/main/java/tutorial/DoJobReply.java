@@ -12,15 +12,18 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("DoJobReply");
 
   private static final org.apache.thrift.protocol.TField LINES_FIELD_DESC = new org.apache.thrift.protocol.TField("lines", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField PAIRS_FIELD_DESC = new org.apache.thrift.protocol.TField("pairs", org.apache.thrift.protocol.TType.LIST, (short)2);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new DoJobReplyStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new DoJobReplyTupleSchemeFactory();
 
   public java.util.List<java.lang.String> lines; // required
+  public java.util.List<StringIntPair> pairs; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    LINES((short)1, "lines");
+    LINES((short)1, "lines"),
+    PAIRS((short)2, "pairs");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -37,6 +40,8 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
       switch(fieldId) {
         case 1: // LINES
           return LINES;
+        case 2: // PAIRS
+          return PAIRS;
         default:
           return null;
       }
@@ -83,6 +88,9 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     tmpMap.put(_Fields.LINES, new org.apache.thrift.meta_data.FieldMetaData("lines", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.PAIRS, new org.apache.thrift.meta_data.FieldMetaData("pairs", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, StringIntPair.class))));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(DoJobReply.class, metaDataMap);
   }
@@ -91,10 +99,12 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
   }
 
   public DoJobReply(
-    java.util.List<java.lang.String> lines)
+    java.util.List<java.lang.String> lines,
+    java.util.List<StringIntPair> pairs)
   {
     this();
     this.lines = lines;
+    this.pairs = pairs;
   }
 
   /**
@@ -105,6 +115,13 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
       java.util.List<java.lang.String> __this__lines = new java.util.ArrayList<java.lang.String>(other.lines);
       this.lines = __this__lines;
     }
+    if (other.isSetPairs()) {
+      java.util.List<StringIntPair> __this__pairs = new java.util.ArrayList<StringIntPair>(other.pairs.size());
+      for (StringIntPair other_element : other.pairs) {
+        __this__pairs.add(new StringIntPair(other_element));
+      }
+      this.pairs = __this__pairs;
+    }
   }
 
   public DoJobReply deepCopy() {
@@ -114,6 +131,7 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
   @Override
   public void clear() {
     this.lines = null;
+    this.pairs = null;
   }
 
   public int getLinesSize() {
@@ -155,6 +173,45 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     }
   }
 
+  public int getPairsSize() {
+    return (this.pairs == null) ? 0 : this.pairs.size();
+  }
+
+  public java.util.Iterator<StringIntPair> getPairsIterator() {
+    return (this.pairs == null) ? null : this.pairs.iterator();
+  }
+
+  public void addToPairs(StringIntPair elem) {
+    if (this.pairs == null) {
+      this.pairs = new java.util.ArrayList<StringIntPair>();
+    }
+    this.pairs.add(elem);
+  }
+
+  public java.util.List<StringIntPair> getPairs() {
+    return this.pairs;
+  }
+
+  public DoJobReply setPairs(java.util.List<StringIntPair> pairs) {
+    this.pairs = pairs;
+    return this;
+  }
+
+  public void unsetPairs() {
+    this.pairs = null;
+  }
+
+  /** Returns true if field pairs is set (has been assigned a value) and false otherwise */
+  public boolean isSetPairs() {
+    return this.pairs != null;
+  }
+
+  public void setPairsIsSet(boolean value) {
+    if (!value) {
+      this.pairs = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, java.lang.Object value) {
     switch (field) {
     case LINES:
@@ -165,6 +222,14 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
       }
       break;
 
+    case PAIRS:
+      if (value == null) {
+        unsetPairs();
+      } else {
+        setPairs((java.util.List<StringIntPair>)value);
+      }
+      break;
+
     }
   }
 
@@ -172,6 +237,9 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     switch (field) {
     case LINES:
       return getLines();
+
+    case PAIRS:
+      return getPairs();
 
     }
     throw new java.lang.IllegalStateException();
@@ -186,6 +254,8 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     switch (field) {
     case LINES:
       return isSetLines();
+    case PAIRS:
+      return isSetPairs();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -214,6 +284,15 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
         return false;
     }
 
+    boolean this_present_pairs = true && this.isSetPairs();
+    boolean that_present_pairs = true && that.isSetPairs();
+    if (this_present_pairs || that_present_pairs) {
+      if (!(this_present_pairs && that_present_pairs))
+        return false;
+      if (!this.pairs.equals(that.pairs))
+        return false;
+    }
+
     return true;
   }
 
@@ -224,6 +303,10 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     hashCode = hashCode * 8191 + ((isSetLines()) ? 131071 : 524287);
     if (isSetLines())
       hashCode = hashCode * 8191 + lines.hashCode();
+
+    hashCode = hashCode * 8191 + ((isSetPairs()) ? 131071 : 524287);
+    if (isSetPairs())
+      hashCode = hashCode * 8191 + pairs.hashCode();
 
     return hashCode;
   }
@@ -242,6 +325,16 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     }
     if (isSetLines()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.lines, other.lines);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = java.lang.Boolean.valueOf(isSetPairs()).compareTo(other.isSetPairs());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetPairs()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.pairs, other.pairs);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -271,6 +364,14 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
       sb.append("null");
     } else {
       sb.append(this.lines);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("pairs:");
+    if (this.pairs == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.pairs);
     }
     first = false;
     sb.append(")");
@@ -334,6 +435,25 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 2: // PAIRS
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list3 = iprot.readListBegin();
+                struct.pairs = new java.util.ArrayList<StringIntPair>(_list3.size);
+                StringIntPair _elem4;
+                for (int _i5 = 0; _i5 < _list3.size; ++_i5)
+                {
+                  _elem4 = new StringIntPair();
+                  _elem4.read(iprot);
+                  struct.pairs.add(_elem4);
+                }
+                iprot.readListEnd();
+              }
+              struct.setPairsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -353,9 +473,21 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
         oprot.writeFieldBegin(LINES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.lines.size()));
-          for (java.lang.String _iter3 : struct.lines)
+          for (java.lang.String _iter6 : struct.lines)
           {
-            oprot.writeString(_iter3);
+            oprot.writeString(_iter6);
+          }
+          oprot.writeListEnd();
+        }
+        oprot.writeFieldEnd();
+      }
+      if (struct.pairs != null) {
+        oprot.writeFieldBegin(PAIRS_FIELD_DESC);
+        {
+          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.pairs.size()));
+          for (StringIntPair _iter7 : struct.pairs)
+          {
+            _iter7.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -382,13 +514,25 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
       if (struct.isSetLines()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetPairs()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
       if (struct.isSetLines()) {
         {
           oprot.writeI32(struct.lines.size());
-          for (java.lang.String _iter4 : struct.lines)
+          for (java.lang.String _iter8 : struct.lines)
           {
-            oprot.writeString(_iter4);
+            oprot.writeString(_iter8);
+          }
+        }
+      }
+      if (struct.isSetPairs()) {
+        {
+          oprot.writeI32(struct.pairs.size());
+          for (StringIntPair _iter9 : struct.pairs)
+          {
+            _iter9.write(oprot);
           }
         }
       }
@@ -397,19 +541,33 @@ public class DoJobReply implements org.apache.thrift.TBase<DoJobReply, DoJobRepl
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, DoJobReply struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-      java.util.BitSet incoming = iprot.readBitSet(1);
+      java.util.BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TList _list5 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.lines = new java.util.ArrayList<java.lang.String>(_list5.size);
-          java.lang.String _elem6;
-          for (int _i7 = 0; _i7 < _list5.size; ++_i7)
+          org.apache.thrift.protocol.TList _list10 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.lines = new java.util.ArrayList<java.lang.String>(_list10.size);
+          java.lang.String _elem11;
+          for (int _i12 = 0; _i12 < _list10.size; ++_i12)
           {
-            _elem6 = iprot.readString();
-            struct.lines.add(_elem6);
+            _elem11 = iprot.readString();
+            struct.lines.add(_elem11);
           }
         }
         struct.setLinesIsSet(true);
+      }
+      if (incoming.get(1)) {
+        {
+          org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.pairs = new java.util.ArrayList<StringIntPair>(_list13.size);
+          StringIntPair _elem14;
+          for (int _i15 = 0; _i15 < _list13.size; ++_i15)
+          {
+            _elem14 = new StringIntPair();
+            _elem14.read(iprot);
+            struct.pairs.add(_elem14);
+          }
+        }
+        struct.setPairsIsSet(true);
       }
     }
   }

@@ -13,8 +13,10 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
 
   private static final org.apache.thrift.protocol.TField WORKER_OP_TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("workerOpType", org.apache.thrift.protocol.TType.I32, (short)1);
   private static final org.apache.thrift.protocol.TField PARTITION_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("partitionId", org.apache.thrift.protocol.TType.I32, (short)2);
-  private static final org.apache.thrift.protocol.TField HDFS_SPLIT_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("hdfsSplitId", org.apache.thrift.protocol.TType.I32, (short)3);
-  private static final org.apache.thrift.protocol.TField FILE_PATH_FIELD_DESC = new org.apache.thrift.protocol.TField("filePath", org.apache.thrift.protocol.TType.STRING, (short)4);
+  private static final org.apache.thrift.protocol.TField INPUT_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("inputId", org.apache.thrift.protocol.TType.I32, (short)3);
+  private static final org.apache.thrift.protocol.TField HDFS_SPLIT_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("hdfsSplitId", org.apache.thrift.protocol.TType.I32, (short)4);
+  private static final org.apache.thrift.protocol.TField FILE_PATH_FIELD_DESC = new org.apache.thrift.protocol.TField("filePath", org.apache.thrift.protocol.TType.STRING, (short)5);
+  private static final org.apache.thrift.protocol.TField FUNC_NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("funcName", org.apache.thrift.protocol.TType.STRING, (short)6);
 
   private static final org.apache.thrift.scheme.SchemeFactory STANDARD_SCHEME_FACTORY = new DoJobArgsStandardSchemeFactory();
   private static final org.apache.thrift.scheme.SchemeFactory TUPLE_SCHEME_FACTORY = new DoJobArgsTupleSchemeFactory();
@@ -25,8 +27,10 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
    */
   public WorkerOpType workerOpType; // required
   public int partitionId; // required
+  public int inputId; // required
   public int hdfsSplitId; // required
   public java.lang.String filePath; // required
+  public java.lang.String funcName; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -36,8 +40,10 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
      */
     WORKER_OP_TYPE((short)1, "workerOpType"),
     PARTITION_ID((short)2, "partitionId"),
-    HDFS_SPLIT_ID((short)3, "hdfsSplitId"),
-    FILE_PATH((short)4, "filePath");
+    INPUT_ID((short)3, "inputId"),
+    HDFS_SPLIT_ID((short)4, "hdfsSplitId"),
+    FILE_PATH((short)5, "filePath"),
+    FUNC_NAME((short)6, "funcName");
 
     private static final java.util.Map<java.lang.String, _Fields> byName = new java.util.HashMap<java.lang.String, _Fields>();
 
@@ -56,10 +62,14 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
           return WORKER_OP_TYPE;
         case 2: // PARTITION_ID
           return PARTITION_ID;
-        case 3: // HDFS_SPLIT_ID
+        case 3: // INPUT_ID
+          return INPUT_ID;
+        case 4: // HDFS_SPLIT_ID
           return HDFS_SPLIT_ID;
-        case 4: // FILE_PATH
+        case 5: // FILE_PATH
           return FILE_PATH;
+        case 6: // FUNC_NAME
+          return FUNC_NAME;
         default:
           return null;
       }
@@ -101,7 +111,8 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
 
   // isset id assignments
   private static final int __PARTITIONID_ISSET_ID = 0;
-  private static final int __HDFSSPLITID_ISSET_ID = 1;
+  private static final int __INPUTID_ISSET_ID = 1;
+  private static final int __HDFSSPLITID_ISSET_ID = 2;
   private byte __isset_bitfield = 0;
   public static final java.util.Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
@@ -110,9 +121,13 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, WorkerOpType.class)));
     tmpMap.put(_Fields.PARTITION_ID, new org.apache.thrift.meta_data.FieldMetaData("partitionId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.INPUT_ID, new org.apache.thrift.meta_data.FieldMetaData("inputId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     tmpMap.put(_Fields.HDFS_SPLIT_ID, new org.apache.thrift.meta_data.FieldMetaData("hdfsSplitId", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     tmpMap.put(_Fields.FILE_PATH, new org.apache.thrift.meta_data.FieldMetaData("filePath", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.FUNC_NAME, new org.apache.thrift.meta_data.FieldMetaData("funcName", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = java.util.Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(DoJobArgs.class, metaDataMap);
@@ -124,16 +139,21 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
   public DoJobArgs(
     WorkerOpType workerOpType,
     int partitionId,
+    int inputId,
     int hdfsSplitId,
-    java.lang.String filePath)
+    java.lang.String filePath,
+    java.lang.String funcName)
   {
     this();
     this.workerOpType = workerOpType;
     this.partitionId = partitionId;
     setPartitionIdIsSet(true);
+    this.inputId = inputId;
+    setInputIdIsSet(true);
     this.hdfsSplitId = hdfsSplitId;
     setHdfsSplitIdIsSet(true);
     this.filePath = filePath;
+    this.funcName = funcName;
   }
 
   /**
@@ -145,9 +165,13 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       this.workerOpType = other.workerOpType;
     }
     this.partitionId = other.partitionId;
+    this.inputId = other.inputId;
     this.hdfsSplitId = other.hdfsSplitId;
     if (other.isSetFilePath()) {
       this.filePath = other.filePath;
+    }
+    if (other.isSetFuncName()) {
+      this.funcName = other.funcName;
     }
   }
 
@@ -160,9 +184,12 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     this.workerOpType = null;
     setPartitionIdIsSet(false);
     this.partitionId = 0;
+    setInputIdIsSet(false);
+    this.inputId = 0;
     setHdfsSplitIdIsSet(false);
     this.hdfsSplitId = 0;
     this.filePath = null;
+    this.funcName = null;
   }
 
   /**
@@ -220,6 +247,29 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     __isset_bitfield = org.apache.thrift.EncodingUtils.setBit(__isset_bitfield, __PARTITIONID_ISSET_ID, value);
   }
 
+  public int getInputId() {
+    return this.inputId;
+  }
+
+  public DoJobArgs setInputId(int inputId) {
+    this.inputId = inputId;
+    setInputIdIsSet(true);
+    return this;
+  }
+
+  public void unsetInputId() {
+    __isset_bitfield = org.apache.thrift.EncodingUtils.clearBit(__isset_bitfield, __INPUTID_ISSET_ID);
+  }
+
+  /** Returns true if field inputId is set (has been assigned a value) and false otherwise */
+  public boolean isSetInputId() {
+    return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __INPUTID_ISSET_ID);
+  }
+
+  public void setInputIdIsSet(boolean value) {
+    __isset_bitfield = org.apache.thrift.EncodingUtils.setBit(__isset_bitfield, __INPUTID_ISSET_ID, value);
+  }
+
   public int getHdfsSplitId() {
     return this.hdfsSplitId;
   }
@@ -267,6 +317,30 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     }
   }
 
+  public java.lang.String getFuncName() {
+    return this.funcName;
+  }
+
+  public DoJobArgs setFuncName(java.lang.String funcName) {
+    this.funcName = funcName;
+    return this;
+  }
+
+  public void unsetFuncName() {
+    this.funcName = null;
+  }
+
+  /** Returns true if field funcName is set (has been assigned a value) and false otherwise */
+  public boolean isSetFuncName() {
+    return this.funcName != null;
+  }
+
+  public void setFuncNameIsSet(boolean value) {
+    if (!value) {
+      this.funcName = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, java.lang.Object value) {
     switch (field) {
     case WORKER_OP_TYPE:
@@ -282,6 +356,14 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         unsetPartitionId();
       } else {
         setPartitionId((java.lang.Integer)value);
+      }
+      break;
+
+    case INPUT_ID:
+      if (value == null) {
+        unsetInputId();
+      } else {
+        setInputId((java.lang.Integer)value);
       }
       break;
 
@@ -301,6 +383,14 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       }
       break;
 
+    case FUNC_NAME:
+      if (value == null) {
+        unsetFuncName();
+      } else {
+        setFuncName((java.lang.String)value);
+      }
+      break;
+
     }
   }
 
@@ -312,11 +402,17 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     case PARTITION_ID:
       return getPartitionId();
 
+    case INPUT_ID:
+      return getInputId();
+
     case HDFS_SPLIT_ID:
       return getHdfsSplitId();
 
     case FILE_PATH:
       return getFilePath();
+
+    case FUNC_NAME:
+      return getFuncName();
 
     }
     throw new java.lang.IllegalStateException();
@@ -333,10 +429,14 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       return isSetWorkerOpType();
     case PARTITION_ID:
       return isSetPartitionId();
+    case INPUT_ID:
+      return isSetInputId();
     case HDFS_SPLIT_ID:
       return isSetHdfsSplitId();
     case FILE_PATH:
       return isSetFilePath();
+    case FUNC_NAME:
+      return isSetFuncName();
     }
     throw new java.lang.IllegalStateException();
   }
@@ -374,6 +474,15 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         return false;
     }
 
+    boolean this_present_inputId = true;
+    boolean that_present_inputId = true;
+    if (this_present_inputId || that_present_inputId) {
+      if (!(this_present_inputId && that_present_inputId))
+        return false;
+      if (this.inputId != that.inputId)
+        return false;
+    }
+
     boolean this_present_hdfsSplitId = true;
     boolean that_present_hdfsSplitId = true;
     if (this_present_hdfsSplitId || that_present_hdfsSplitId) {
@@ -392,6 +501,15 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         return false;
     }
 
+    boolean this_present_funcName = true && this.isSetFuncName();
+    boolean that_present_funcName = true && that.isSetFuncName();
+    if (this_present_funcName || that_present_funcName) {
+      if (!(this_present_funcName && that_present_funcName))
+        return false;
+      if (!this.funcName.equals(that.funcName))
+        return false;
+    }
+
     return true;
   }
 
@@ -405,11 +523,17 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
 
     hashCode = hashCode * 8191 + partitionId;
 
+    hashCode = hashCode * 8191 + inputId;
+
     hashCode = hashCode * 8191 + hdfsSplitId;
 
     hashCode = hashCode * 8191 + ((isSetFilePath()) ? 131071 : 524287);
     if (isSetFilePath())
       hashCode = hashCode * 8191 + filePath.hashCode();
+
+    hashCode = hashCode * 8191 + ((isSetFuncName()) ? 131071 : 524287);
+    if (isSetFuncName())
+      hashCode = hashCode * 8191 + funcName.hashCode();
 
     return hashCode;
   }
@@ -442,6 +566,16 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         return lastComparison;
       }
     }
+    lastComparison = java.lang.Boolean.valueOf(isSetInputId()).compareTo(other.isSetInputId());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetInputId()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.inputId, other.inputId);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     lastComparison = java.lang.Boolean.valueOf(isSetHdfsSplitId()).compareTo(other.isSetHdfsSplitId());
     if (lastComparison != 0) {
       return lastComparison;
@@ -458,6 +592,16 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     }
     if (isSetFilePath()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.filePath, other.filePath);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = java.lang.Boolean.valueOf(isSetFuncName()).compareTo(other.isSetFuncName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetFuncName()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.funcName, other.funcName);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -494,6 +638,10 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
     sb.append(this.partitionId);
     first = false;
     if (!first) sb.append(", ");
+    sb.append("inputId:");
+    sb.append(this.inputId);
+    first = false;
+    if (!first) sb.append(", ");
     sb.append("hdfsSplitId:");
     sb.append(this.hdfsSplitId);
     first = false;
@@ -503,6 +651,14 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       sb.append("null");
     } else {
       sb.append(this.filePath);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("funcName:");
+    if (this.funcName == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.funcName);
     }
     first = false;
     sb.append(")");
@@ -566,7 +722,15 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 3: // HDFS_SPLIT_ID
+          case 3: // INPUT_ID
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.inputId = iprot.readI32();
+              struct.setInputIdIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 4: // HDFS_SPLIT_ID
             if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
               struct.hdfsSplitId = iprot.readI32();
               struct.setHdfsSplitIdIsSet(true);
@@ -574,10 +738,18 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 4: // FILE_PATH
+          case 5: // FILE_PATH
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
               struct.filePath = iprot.readString();
               struct.setFilePathIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 6: // FUNC_NAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.funcName = iprot.readString();
+              struct.setFuncNameIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -605,12 +777,20 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       oprot.writeFieldBegin(PARTITION_ID_FIELD_DESC);
       oprot.writeI32(struct.partitionId);
       oprot.writeFieldEnd();
+      oprot.writeFieldBegin(INPUT_ID_FIELD_DESC);
+      oprot.writeI32(struct.inputId);
+      oprot.writeFieldEnd();
       oprot.writeFieldBegin(HDFS_SPLIT_ID_FIELD_DESC);
       oprot.writeI32(struct.hdfsSplitId);
       oprot.writeFieldEnd();
       if (struct.filePath != null) {
         oprot.writeFieldBegin(FILE_PATH_FIELD_DESC);
         oprot.writeString(struct.filePath);
+        oprot.writeFieldEnd();
+      }
+      if (struct.funcName != null) {
+        oprot.writeFieldBegin(FUNC_NAME_FIELD_DESC);
+        oprot.writeString(struct.funcName);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -637,18 +817,27 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       if (struct.isSetPartitionId()) {
         optionals.set(1);
       }
-      if (struct.isSetHdfsSplitId()) {
+      if (struct.isSetInputId()) {
         optionals.set(2);
       }
-      if (struct.isSetFilePath()) {
+      if (struct.isSetHdfsSplitId()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetFilePath()) {
+        optionals.set(4);
+      }
+      if (struct.isSetFuncName()) {
+        optionals.set(5);
+      }
+      oprot.writeBitSet(optionals, 6);
       if (struct.isSetWorkerOpType()) {
         oprot.writeI32(struct.workerOpType.getValue());
       }
       if (struct.isSetPartitionId()) {
         oprot.writeI32(struct.partitionId);
+      }
+      if (struct.isSetInputId()) {
+        oprot.writeI32(struct.inputId);
       }
       if (struct.isSetHdfsSplitId()) {
         oprot.writeI32(struct.hdfsSplitId);
@@ -656,12 +845,15 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
       if (struct.isSetFilePath()) {
         oprot.writeString(struct.filePath);
       }
+      if (struct.isSetFuncName()) {
+        oprot.writeString(struct.funcName);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, DoJobArgs struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TTupleProtocol iprot = (org.apache.thrift.protocol.TTupleProtocol) prot;
-      java.util.BitSet incoming = iprot.readBitSet(4);
+      java.util.BitSet incoming = iprot.readBitSet(6);
       if (incoming.get(0)) {
         struct.workerOpType = tutorial.WorkerOpType.findByValue(iprot.readI32());
         struct.setWorkerOpTypeIsSet(true);
@@ -671,12 +863,20 @@ public class DoJobArgs implements org.apache.thrift.TBase<DoJobArgs, DoJobArgs._
         struct.setPartitionIdIsSet(true);
       }
       if (incoming.get(2)) {
+        struct.inputId = iprot.readI32();
+        struct.setInputIdIsSet(true);
+      }
+      if (incoming.get(3)) {
         struct.hdfsSplitId = iprot.readI32();
         struct.setHdfsSplitIdIsSet(true);
       }
-      if (incoming.get(3)) {
+      if (incoming.get(4)) {
         struct.filePath = iprot.readString();
         struct.setFilePathIsSet(true);
+      }
+      if (incoming.get(5)) {
+        struct.funcName = iprot.readString();
+        struct.setFuncNameIsSet(true);
       }
     }
   }

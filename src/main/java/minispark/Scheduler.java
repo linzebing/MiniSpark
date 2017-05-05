@@ -19,21 +19,28 @@ public class Scheduler {
   }
 
   public void runPartition(Rdd targetRdd, int index) throws TException {
+    DoJobArgs args = null;
+    Partition partition = null;
+    Partition parentPartition = null;
     switch (targetRdd.operationType) {
       case HdfsFile:
-        Partition partition = targetRdd.partitions.get(index);
+        partition = targetRdd.partitions.get(index);
         assert(partition.hostName.equals(""));
 
-        DoJobArgs args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, index, targetRdd.filePath);
+        args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, -1, index, targetRdd.filePath, "");
 
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
 
         // TODO: should pick a random server here
-        DoJobReply reply = this.master.assignJob(serverList.get(0), args);
+        this.master.assignJob(serverList.get(0), args);
         targetRdd.partitions.get(index).hostName = serverList.get(0);
         break;
       case Map:
-
+        partition = targetRdd.partitions.get(index);
+        parentPartition = targetRdd.parentRdd.partitions.get(index);
+        assert(targetRdd.function.length() != 0);
+        args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        this.master.assignJob(parentPartition.hostName, args);
         break;
 
       case Reduce:
@@ -81,14 +88,14 @@ public class Scheduler {
     runRddInStage(targetRdd);
   }
 
-  public Object computeRdd(Rdd rdd, Common.OperationType operationType, Function function) throws TException, IOException {
+  public Object computeRdd(Rdd rdd, Common.OperationType operationType, String function) throws TException, IOException {
     computeRddByStage(rdd);
     switch (operationType) {
       case Collect:
         ArrayList<String> result = new ArrayList<String>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, "");
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, -1, "", "");
 
           DoJobReply reply = this.master.assignJob(partition.hostName, args);
           result.addAll(reply.lines);
