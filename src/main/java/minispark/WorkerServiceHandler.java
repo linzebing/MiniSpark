@@ -59,6 +59,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             for (String str: input) {
               output.add((String) method.invoke(null, str));
             }
+            hashMap.put(args.partitionId, output);
           } catch (Exception e) {
             e.printStackTrace();
           }
