@@ -10,10 +10,6 @@ import java.util.List;
 
 import static minispark.Common.getPartitionID;
 
-interface Function {
-
-}
-
 class Partition {
 
   // Different from partitionIndex. partitionId uniquely identifies a partition on the worker node
@@ -37,7 +33,7 @@ public class Rdd {
   public Rdd parentRdd; // Rdd that this current Rdd is derived from
   public int numPartitions; // Number of Partitions
   public Object lock;
-  public Function function;
+  public String function;
 
   /*
     Blocks are physical division and input splits are logical division.
@@ -52,7 +48,7 @@ public class Rdd {
    */
   public ArrayList<Partition> partitions;
 
-  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final Function _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath) {
+  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final String _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath) {
     this.sparkContext = _sparkContext;
     this.dependencyType = _dependencyType;
     this.operationType = _operationType;
@@ -76,11 +72,11 @@ public class Rdd {
     return this;
   }
 
-  public Rdd map(Function _function) {
+  public Rdd map(String _function) {
     return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
   }
 
-  public Rdd flatMap(Function _function) {
+  public Rdd flatMap(String _function) {
     return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
   }
 

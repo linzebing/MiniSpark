@@ -3,6 +3,7 @@ package minispark;
 import minispark.Common.*;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,6 +21,19 @@ import tutorial.WorkerService;
  * Created by lzb on 5/4/17.
  */
 public class Worker {
+
+  /*
+  System.out.println(mapTest("s"));
+    try {
+    Method method = App.class.getMethod("mapTest", String.class);
+    method.invoke(null, "s");
+  } catch (Exception e) {
+    e.printStackTrace();
+  }*/
+
+  public static String mapTest(String s) {
+    return s + s;
+  }
 
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
