@@ -1,6 +1,9 @@
 package minispark;
 
-import minispark.Common.*;
+import org.apache.thrift.TException;
+import tutorial.*;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -15,20 +18,21 @@ public class Scheduler {
     this.master = new Master(masterAddress, masterPort);
   }
 
-  public void runPartition(Rdd targetRdd, int index) {
+  public void runPartition(Rdd targetRdd, int index) throws TException {
     switch (targetRdd.operationType) {
       case HdfsFile:
         Partition partition = targetRdd.partitions.get(index);
         assert(partition.hostName.equals(""));
 
-        DoJobArgs args = new DoJobArgs(WorkerOpType.ReadHDFSSplit, partition.partitionId, index, targetRdd.filePath);
+        DoJobArgs args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, index, targetRdd.filePath);
         DoJobReply reply = new DoJobReply();
 
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
 
         // TODO: should pick a random server here
         this.master.assignJob(serverList.get(0), args, reply);
-        targetRdd.partitions.get(index).hostName = serverList.get(0);
+        //targetRdd.partitions.get(index).hostName = serverList.get(0);
+        targetRdd.partitions.get(index).hostName = "ec2-34-205-29-215.compute-1.amazonaws.com";
         break;
       case Map:
 
@@ -44,7 +48,7 @@ public class Scheduler {
     }
   }
 
-  public void runPartitionRecursively(Rdd targetRdd, int index) {
+  public void runPartitionRecursively(Rdd targetRdd, int index) throws IOException, TException {
     // Should be multithreaded
     // TODO: deal with WIDE dependency here
     if (targetRdd.dependencyType != Common.DependencyType.Wide) {
@@ -55,14 +59,14 @@ public class Scheduler {
     }
   }
 
-  public void runRddInStage(Rdd targetRdd) {
+  public void runRddInStage(Rdd targetRdd) throws TException, IOException {
     // TODO: should be multithreaded
     for (int i = 0; i < targetRdd.numPartitions; ++i) {
       runPartitionRecursively(targetRdd, i);
     }
   }
 
-  public void computeRddByStage(Rdd targetRdd) {
+  public void computeRddByStage(Rdd targetRdd) throws IOException, TException {
     // Because MiniSpark doesn't support opeartors like join that involves multiple RDDs, therefore
     // we omit building a DAG here.
     // 多线程情况下wide dependency一定要等前面的依赖全都执行完成了才能继续
@@ -79,15 +83,16 @@ public class Scheduler {
     runRddInStage(targetRdd);
   }
 
-  public Object computeRdd(Rdd rdd, OperationType operationType, Function function) {
+  public Object computeRdd(Rdd rdd, Common.OperationType operationType, Function function) throws TException, IOException {
     computeRddByStage(rdd);
     switch (operationType) {
       case Collect:
         ArrayList<String> result = new ArrayList<String>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId);
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, "");
           DoJobReply reply = new DoJobReply();
+          reply.lines = new ArrayList<String>();
 
           this.master.assignJob(partition.hostName, args, reply);
           result.addAll(reply.lines);

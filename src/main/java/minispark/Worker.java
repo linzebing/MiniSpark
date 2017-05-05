@@ -14,36 +14,40 @@ import org.apache.thrift.transport.TSSLTransportFactory;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
+import tutorial.WorkerService;
 
 /**
  * Created by lzb on 5/4/17.
  */
 public class Worker {
 
-  public static HashMap<Integer, Object> hashMap;
-
-  public void doJob(DoJobArgs args, DoJobReply reply) throws IOException {
-    switch (args.workerOpType) {
-      case GetSplit:
-        if (hashMap.containsKey(args.partitionId)) {
-          reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
-        } else {
-          // TODO: I don't know
-
-        }
-        break;
-      case ReadHDFSSplit:
-        if (hashMap.containsKey(args.partitionId)) {
-          // Already in memory
-          return;
-        } else {
-          hashMap.put(args.partitionId, HdfsSplitReader.HdfsSplitRead(args.filePath, args.hdfsSplitId));
-        }
-        break;
-    }
-  }
+  public static WorkerServiceHandler handler;
+  public static WorkerService.Processor processor;
 
   public static void main(String[] args) {
+    handler = new WorkerServiceHandler();
+    processor = new WorkerService.Processor(handler);
+    Runnable simple = new Runnable() {
+      public void run() {
+        simple(processor);
+      }
+    };
 
+    new Thread(simple).start();
+  }
+
+  public static void simple(WorkerService.Processor processor) {
+    try {
+      TServerTransport serverTransport = new TServerSocket(9090);
+      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
+
+      // Use this for a multithreaded server
+      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+
+      System.out.println("Starting the simple server...");
+      server.serve();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

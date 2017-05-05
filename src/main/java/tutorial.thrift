@@ -143,6 +143,28 @@ service Calculator extends shared.SharedService {
 
 }
 
+enum WorkerOpType {
+  ReadHdfsSplit = 1,
+  GetSplit = 2,
+  DelSplit = 3
+}
+
+struct DoJobArgs {
+  1: WorkerOpType workerOpType,
+  2: i32 partitionId,
+  3: i32 hdfsSplitId,
+  4: string filePath
+}
+
+struct DoJobReply {
+   1: list<string> lines
+}
+
+service WorkerService {
+    void doJob(1:DoJobArgs jobArgs, 2:DoJobReply jobReply)
+}
+
+
 /**
  * That just about covers the basics. Take a look in the test/ folder for more
  * detailed examples. After you run this file, your generated code shows up

@@ -1,5 +1,7 @@
 package minispark;
 
+import tutorial.WorkerOpType;
+
 import java.util.ArrayList;
 
 /**
@@ -20,10 +22,7 @@ public class Common {
     Map, FlatMap, Reduce, ReduceByKey, Filter, Collect, HdfsFile
   }
 
-  public enum WorkerOpType {
-    ReadHDFSSplit, GetSplit, DelSplit
-  }
-
+  /*
   static class DoJobReply {
     public ArrayList<String> lines;
 
@@ -48,7 +47,7 @@ public class Common {
       this.hdfsSplitId = _hdfsSplitId;
       this.filePath = _filePath;
     }
-  }
+  }*/
 
   public static int getPartitionID() {
     return counter++;

@@ -2,7 +2,9 @@ package minispark;
 
 import minispark.Common.DependencyType;
 import minispark.Common.OperationType;
+import org.apache.thrift.TException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,7 @@ public class Rdd {
     this.function = _function;
     this.hdfsSplitInfo = _hdfsSplitInfo;
     this.filePath = _filePath;
+    this.partitions = new ArrayList<Partition>();
 
     for (int i = 0; i < this.numPartitions; ++i) {
       partitions.add(new Partition(getPartitionID(), ""));
@@ -89,7 +92,7 @@ public class Rdd {
     return this;
   }
 
-  public ArrayList<String> collect() {
+  public ArrayList<String> collect() throws IOException, TException {
     return (ArrayList<String>) this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
   }
 }

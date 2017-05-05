@@ -54,6 +54,6 @@ public class HdfsSplitReader {
   }
 
   public static void main(String[] args) throws IOException {
-    HdfsSplitRead("webhdfs://ec2-34-205-85-106.compute-1.amazonaws.com/test.txt", 0);
+    HdfsSplitRead("webhdfs://ec2-34-200-250-79.compute-1.amazonaws.com/test.txt", 0);
   }
 }
