@@ -80,7 +80,7 @@ public class Rdd {
   }
 
   public Rdd mapPair(String _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.MapPair, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.MapPair, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, true);
   }
 
   public Rdd flatMap(String _function) {
