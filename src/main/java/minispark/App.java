@@ -15,7 +15,7 @@ import java.lang.reflect.*;
 public class App {
 
   public static String mapTest(String s) {
-    return s + s;
+    return s.toLowerCase();
   }
 
   public static ArrayList<String> flatMapTest(String s) {
@@ -31,7 +31,7 @@ public class App {
   public static void main(String[] args) throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-31-106.compute-1.amazonaws.com/test.txt");
-    Rdd pairs = lines.map("flatMapTest");
+    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest");
 
     List<String> output = (List<String>) pairs.collect();
 
