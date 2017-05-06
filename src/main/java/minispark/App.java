@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.lang.reflect.*;
 
 /**
  * Created by lzb on 4/16/17.
@@ -22,21 +21,19 @@ public class App {
     return new ArrayList<String>(Arrays.asList(s.split(" ")));
   }
 
-  public static List<StringIntPair> mapCount(String s) {
-    ArrayList<StringIntPair> result = new ArrayList<>();
-
-    return result;
+  public static StringIntPair mapCount(String s) {
+    return new StringIntPair(s, 1);
   }
 
   public static void main(String[] args) throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-31-106.compute-1.amazonaws.com/test.txt");
-    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest");
+    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest").mapPair("mapCount");
 
-    List<String> output = (List<String>) pairs.collect();
+    List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
 
-    for (String str: output) {
-      System.out.println(str);
+    for (StringIntPair pair: output) {
+      System.out.println(pair.toString());
     }
 
     //List<StringIntPair> output = (List<StringIntPair>) pairs.collect();

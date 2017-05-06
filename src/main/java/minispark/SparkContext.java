@@ -21,7 +21,7 @@ public class SparkContext {
 
   public Rdd textFile(String hdfsAddr) throws IOException {
     ArrayList<ArrayList<String>> hdfsSplitInfo = HdfsSplitReader.HdfsGetSplitInfo(hdfsAddr);
-    Rdd rdd = new Rdd(this, Common.DependencyType.Narrow, Common.OperationType.HdfsFile, null, hdfsSplitInfo.size(), null, hdfsSplitInfo, hdfsAddr);
+    Rdd rdd = new Rdd(this, Common.DependencyType.Narrow, Common.OperationType.HdfsFile, null, hdfsSplitInfo.size(), null, hdfsSplitInfo, hdfsAddr, false);
 
     return rdd;
   }
