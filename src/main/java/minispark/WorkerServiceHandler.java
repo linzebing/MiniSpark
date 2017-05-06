@@ -58,6 +58,23 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           }
         }
         break;
+      case MapPairJob:
+        if (hashMap.containsKey(args.partitionId)) {
+          reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+        } else {
+          try {
+            Method method = App.class.getMethod(args.funcName, String.class);
+            ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
+            ArrayList<StringIntPair> output = new ArrayList<>();
+            for (String str: input) {
+              output.add((StringIntPair) method.invoke(null, str));
+            }
+            hashMap.put(args.partitionId, output);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        break;
       case FlatMapJob:
         if (hashMap.containsKey(args.partitionId)) {
           reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);

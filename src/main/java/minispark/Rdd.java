@@ -35,6 +35,8 @@ public class Rdd {
   public Object lock;
   public String function;
 
+  public boolean isPairRdd;
+
   /*
     Blocks are physical division and input splits are logical division.
     One input split can be map to multiple physical blocks.
@@ -48,7 +50,7 @@ public class Rdd {
    */
   public ArrayList<Partition> partitions;
 
-  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final String _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath) {
+  public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final String _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath, boolean _isPairRdd) {
     this.sparkContext = _sparkContext;
     this.dependencyType = _dependencyType;
     this.operationType = _operationType;
@@ -65,6 +67,7 @@ public class Rdd {
     }
 
     this.cacheHint = false;
+    this.isPairRdd = _isPairRdd;
   }
 
   public Rdd cache() {
@@ -73,11 +76,15 @@ public class Rdd {
   }
 
   public Rdd map(String _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Map, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
+  }
+
+  public Rdd mapPair(String _function) {
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.MapPair, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
   public Rdd flatMap(String _function) {
-    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath);
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
   public Rdd count() {
@@ -89,6 +96,6 @@ public class Rdd {
   }
 
   public Object collect() throws IOException, TException {
-    return this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
+    return this.sparkContext.scheduler.computeRdd(this, this.isPairRdd? OperationType.PairCollect: OperationType.Collect, null);
   }
 }

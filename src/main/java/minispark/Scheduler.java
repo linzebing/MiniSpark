@@ -42,6 +42,13 @@ public class Scheduler {
         args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
         this.master.assignJob(parentPartition.hostName, args);
         break;
+      case MapPair:
+        partition = targetRdd.partitions.get(index);
+        parentPartition = targetRdd.parentRdd.partitions.get(index);
+        assert(targetRdd.function.length() != 0);
+        args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        this.master.assignJob(parentPartition.hostName, args);
+        break;
       case FlatMap:
         partition = targetRdd.partitions.get(index);
         parentPartition = targetRdd.parentRdd.partitions.get(index);
@@ -108,6 +115,16 @@ public class Scheduler {
           result.addAll(reply.lines);
         }
         return result;
+      case PairCollect:
+        ArrayList<StringIntPair> pairResult = new ArrayList<StringIntPair>();
+        for (int i = 0; i < rdd.numPartitions; ++i) {
+          Partition partition = rdd.partitions.get(i);
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, -1, "", "");
+
+          DoJobReply reply = this.master.assignJob(partition.hostName, args);
+          pairResult.addAll(reply.pairs);
+        }
+        return pairResult;
       case Reduce:
         break;
     }
