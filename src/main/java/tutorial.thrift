@@ -78,7 +78,8 @@ enum WorkerOpType {
   ReduceJob = 7,
   ReduceByKeyJob = 8,
   CountJob = 9,
-  MapPairJob = 10
+  MapPairJob = 10,
+  GetPairSplit = 11
 }
 
 struct DoJobArgs {

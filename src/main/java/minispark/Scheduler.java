@@ -119,7 +119,7 @@ public class Scheduler {
         ArrayList<StringIntPair> pairResult = new ArrayList<StringIntPair>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, -1, "", "");
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetPairSplit, partition.partitionId, -1, -1, "", "");
 
           DoJobReply reply = this.master.assignJob(partition.hostName, args);
           pairResult.addAll(reply.pairs);
