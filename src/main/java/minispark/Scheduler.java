@@ -42,6 +42,13 @@ public class Scheduler {
         args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
         this.master.assignJob(parentPartition.hostName, args);
         break;
+      case FlatMap:
+        partition = targetRdd.partitions.get(index);
+        parentPartition = targetRdd.parentRdd.partitions.get(index);
+        assert(targetRdd.function.length() != 0);
+        args = new DoJobArgs(WorkerOpType.FlatMapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        this.master.assignJob(parentPartition.hostName, args);
+        break;
 
       case Reduce:
 

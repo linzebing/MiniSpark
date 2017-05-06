@@ -88,7 +88,7 @@ public class Rdd {
     return this;
   }
 
-  public ArrayList<String> collect() throws IOException, TException {
-    return (ArrayList<String>) this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
+  public Object collect() throws IOException, TException {
+    return this.sparkContext.scheduler.computeRdd(this, OperationType.Collect, null);
   }
 }
