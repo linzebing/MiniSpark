@@ -18,6 +18,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
   public static HashMap<Integer, Object> hashMap = new HashMap<Integer, Object>();
 
   public ArrayList<StringIntPair> readPartition(int partitionId) {
+    System.out.println("Received readPartition");
     assert hashMap.containsKey(partitionId);
     return (ArrayList<StringIntPair>)hashMap.get(partitionId);
   }
@@ -26,6 +27,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     DoJobReply reply = new DoJobReply();
     switch (args.workerOpType) {
       case GetSplit:
+        System.out.println("Received GetSplit");
         if (hashMap.containsKey(args.partitionId)) {
           reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
@@ -34,6 +36,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case GetPairSplit:
+        System.out.println("Received GetPairSplit");
         if (hashMap.containsKey(args.partitionId)) {
           reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
         } else {
@@ -42,6 +45,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case ReadHdfsSplit:
+        System.out.println("Received ReadHdfsSplit");
         if (hashMap.containsKey(args.partitionId)) {
           // Already in memory
         } else {
@@ -53,6 +57,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case MapJob:
+        System.out.println("Received MapJob");
         if (hashMap.containsKey(args.partitionId)) {
           // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
@@ -70,6 +75,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case MapPairJob:
+        System.out.println("Received MapPairJob");
         if (hashMap.containsKey(args.partitionId)) {
           // reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
         } else {
@@ -87,6 +93,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case FlatMapJob:
+        System.out.println("Received FlatMapJob");
         if (hashMap.containsKey(args.partitionId)) {
           // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
@@ -104,6 +111,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case HashSplit:
+        System.out.println("Received HashSplit");
         // Check if already in memory first
         boolean flag = true;
         int size = args.shufflePartitionIds.size();
@@ -125,6 +133,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
         break;
       case ReduceByKeyJob:
+        System.out.println("Received ReduceByKeyJob");
         if (hashMap.containsKey(args.partitionId)) {
           // Output already exists
         } else {
