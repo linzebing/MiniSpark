@@ -17,9 +17,12 @@ import java.util.List;
 public class WorkerServiceHandler implements WorkerService.Iface {
   public static HashMap<Integer, Object> hashMap = new HashMap<Integer, Object>();
 
+  public ArrayList<StringIntPair> readPartition(int partitionId) {
+    assert hashMap.containsKey(partitionId);
+    return (ArrayList<StringIntPair>)hashMap.get(partitionId);
+  }
 
-
-  public DoJobReply doJob(DoJobArgs args) {
+  public DoJobReply doJob(DoJobArgs args) throws TException {
     DoJobReply reply = new DoJobReply();
     switch (args.workerOpType) {
       case GetSplit:
@@ -35,7 +38,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
         } else {
           // TODO: I don't know
-          System.out.println("GetSplit Exception");
+          System.out.println("GetPairSplit Exception");
         }
         break;
       case ReadHdfsSplit:
@@ -51,7 +54,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         break;
       case MapJob:
         if (hashMap.containsKey(args.partitionId)) {
-          reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
+          // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
           try {
             Method method = App.class.getMethod(args.funcName, String.class);
@@ -68,7 +71,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         break;
       case MapPairJob:
         if (hashMap.containsKey(args.partitionId)) {
-          reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+          // reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
         } else {
           try {
             Method method = App.class.getMethod(args.funcName, String.class);
@@ -85,7 +88,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         break;
       case FlatMapJob:
         if (hashMap.containsKey(args.partitionId)) {
-          reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
+          // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
           try {
             Method method = App.class.getMethod(args.funcName, String.class);
@@ -100,7 +103,71 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           }
         }
         break;
+      case HashSplit:
+        // Check if already in memory first
+        boolean flag = true;
+        int size = args.shufflePartitionIds.size();
+        for (int shufflePartitionId: args.shufflePartitionIds) {
+          if (!hashMap.containsKey(shufflePartitionId)) {
+            flag = false;
+          }
+        }
+        if (flag) {
+          // Already in memory
+          break;
+        }
+        ArrayList<StringIntPair>[] hashedResults = new ArrayList[size];
+        for (StringIntPair pair: (ArrayList<StringIntPair>) hashMap.get(args.inputId)) {
+          hashedResults[pair.str.hashCode() % size].add(pair);
+        }
+        for (int i = 0; i < size; ++i) {
+          hashMap.put(args.shufflePartitionIds.get(i), hashedResults[i]);
+        }
+        break;
+      case ReduceByKeyJob:
+        if (hashMap.containsKey(args.partitionId)) {
+          // Output already exists
+        } else {
+          ArrayList<StringIntPair> lines = Worker.readPartitions(args.inputIds, args.inputHostNames);
+          HashMap<String, ArrayList<Integer>> kvStore = new HashMap<>();
+          for (StringIntPair pair: lines) {
+            if (kvStore.containsKey(pair.str)) {
+              kvStore.get(pair.str).add(pair.num);
+            } else {
+              ArrayList<Integer> arrayList = new ArrayList<>();
+              arrayList.add(pair.num);
+              kvStore.put(pair.str, arrayList);
+            }
+          }
+          ArrayList<StringIntPair> output = new ArrayList<>();
+          try {
+            Method method = App.class.getMethod(args.funcName, String.class);
+            for (String key: kvStore.keySet()) {
+              output.add(new StringIntPair(key, reduceHelper(method, kvStore.get(key))));
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          hashMap.put(args.partitionId, output);
+        }
     }
     return reply;
+  }
+
+  public static int reduceHelper(Method method, ArrayList<Integer> values) {
+    assert !values.isEmpty();
+    if (values.size() == 1) {
+      return values.get(0);
+    } else {
+      int initVal = values.get(0);
+      for (int i = 1; i < values.size(); ++i) {
+        try {
+          initVal = (int) method.invoke(null, initVal, values.get(i));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+      return initVal;
+    }
   }
 }

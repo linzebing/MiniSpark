@@ -6,15 +6,18 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import org.apache.thrift.TException;
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServer.Args;
 import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadPoolServer;
-import org.apache.thrift.transport.TSSLTransportFactory;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TServerTransport;
+import org.apache.thrift.transport.*;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
+import tutorial.StringIntPair;
 import tutorial.WorkerService;
 
 /**
@@ -22,10 +25,11 @@ import tutorial.WorkerService;
  */
 public class Worker {
 
+  public static WorkerService.Client client;
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws TTransportException {
     handler = new WorkerServiceHandler();
     processor = new WorkerService.Processor(handler);
     Runnable simple = new Runnable() {
@@ -35,6 +39,23 @@ public class Worker {
     };
 
     new Thread(simple).start();
+
+    TTransport transport = new TSocket("localhost", 9090);
+    transport.open();
+
+    TProtocol protocol = new TBinaryProtocol(transport);
+    client = new WorkerService.Client(protocol);
+  }
+
+  public static ArrayList<StringIntPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
+    // TODO: choose client according to hostName
+    assert inputIds.size() == inputHostNames.size();
+    int size = inputIds.size();
+    ArrayList<StringIntPair> everything = new ArrayList<>();
+    for (int i = 0; i < size; ++i) {
+      everything.addAll(client.readPartition(inputIds.get(i)));
+    }
+    return everything;
   }
 
   public static void simple(WorkerService.Processor processor) {

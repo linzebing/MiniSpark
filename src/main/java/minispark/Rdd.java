@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static minispark.Common.getPartitionID;
+import static minispark.Common.getPartitionId;
 
 class Partition {
 
@@ -18,6 +18,9 @@ class Partition {
   public Partition(int _partitionId, String _hostName) {
     this.partitionId = _partitionId;
     this.hostName = _hostName;
+  }
+  public Partition() {
+
   }
 }
 
@@ -63,7 +66,7 @@ public class Rdd {
     this.partitions = new ArrayList<Partition>();
 
     for (int i = 0; i < this.numPartitions; ++i) {
-      partitions.add(new Partition(getPartitionID(), ""));
+      partitions.add(new Partition(getPartitionId(), ""));
     }
 
     this.cacheHint = false;
@@ -87,12 +90,17 @@ public class Rdd {
     return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FlatMap, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
+  public Rdd reduceByKey(String _function) {
+    assert this.isPairRdd;
+    return new Rdd(this.sparkContext, DependencyType.Wide, OperationType.ReduceByKey, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
+  }
+
   public Rdd count() {
     return this;
   }
 
-  public Rdd reduce() {
-    return this;
+  public double reduce() {
+    return 0;
   }
 
   public Object collect() throws IOException, TException {

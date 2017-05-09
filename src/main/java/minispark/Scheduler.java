@@ -6,11 +6,14 @@ import tutorial.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static minispark.Common.getPartitionId;
+
 /**
  * Created by lzb on 4/8/17.
  */
 public class Scheduler {
   Master master;
+  Partition[][] shufflePartitions;
 
   public Scheduler() {
     String masterAddress = "";
@@ -20,14 +23,13 @@ public class Scheduler {
 
   public void runPartition(Rdd targetRdd, int index) throws TException {
     DoJobArgs args = null;
-    Partition partition = null;
-    Partition parentPartition = null;
+    Partition partition = targetRdd.partitions.get(index);
+    Partition parentPartition = targetRdd.parentRdd == null ? null: targetRdd.parentRdd.partitions.get(index);
     switch (targetRdd.operationType) {
       case HdfsFile:
-        partition = targetRdd.partitions.get(index);
         assert(partition.hostName.equals(""));
 
-        args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, -1, index, targetRdd.filePath, "");
+        args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, -1, index, targetRdd.filePath, "", null, null, null);
 
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
 
@@ -36,46 +38,54 @@ public class Scheduler {
         targetRdd.partitions.get(index).hostName = serverList.get(0);
         break;
       case Map:
-        partition = targetRdd.partitions.get(index);
-        parentPartition = targetRdd.parentRdd.partitions.get(index);
         assert(targetRdd.function.length() != 0);
-        args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
         break;
       case MapPair:
-        partition = targetRdd.partitions.get(index);
-        parentPartition = targetRdd.parentRdd.partitions.get(index);
         assert(targetRdd.function.length() != 0);
-        args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
         break;
       case FlatMap:
-        partition = targetRdd.partitions.get(index);
-        parentPartition = targetRdd.parentRdd.partitions.get(index);
         assert(targetRdd.function.length() != 0);
-        args = new DoJobArgs(WorkerOpType.FlatMapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function);
+        args = new DoJobArgs(WorkerOpType.FlatMapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
         break;
-
+      case ReduceByKey:
+        int prevNumPartitions = targetRdd.parentRdd.numPartitions;
+        ArrayList<Integer> inputIds = new ArrayList<>();
+        ArrayList<String> inputHostNames = new ArrayList<>();
+        for (int i = 0; i < prevNumPartitions; ++i) {
+          inputIds.add(shufflePartitions[i][index].partitionId);
+          inputHostNames.add(shufflePartitions[i][index].hostName);
+        }
+        args = new DoJobArgs();
+        args.workerOpType = WorkerOpType.ReduceByKeyJob;
+        args.inputIds = inputIds;
+        args.inputHostNames = inputHostNames;
+        args.partitionId = partition.partitionId;
+        args.funcName = targetRdd.function;
+        args.hdfsSplitId = index;
+        // TODO: random pick a host name is OK
+        this.master.assignJob("randomPickAhostName", args);
+        break;
       case Reduce:
 
         break;
 
-      case ReduceByKey:
 
-        break;
     }
   }
 
   public void runPartitionRecursively(Rdd targetRdd, int index) throws IOException, TException {
-    // Should be multithreaded
-    // TODO: deal with WIDE dependency here
+    // TODO: Should be multithreaded
     if (targetRdd.dependencyType != Common.DependencyType.Wide) {
       if (targetRdd.parentRdd != null) {
         runPartitionRecursively(targetRdd.parentRdd, index);
       }
-      runPartition(targetRdd, index);
     }
+    runPartition(targetRdd, index);
   }
 
   public void runRddInStage(Rdd targetRdd) throws TException, IOException {
@@ -88,18 +98,29 @@ public class Scheduler {
   public void computeRddByStage(Rdd targetRdd) throws IOException, TException {
     // Because MiniSpark doesn't support opeartors like join that involves multiple RDDs, therefore
     // we omit building a DAG here.
-    // 多线程情况下wide dependency一定要等前面的依赖全都执行完成了才能继续
-    /*ArrayList<Rdd> sortedRddList = new ArrayList<Rdd>();
-    Rdd tmpRdd = targetRdd;
-    while (tmpRdd != null) {
-      sortedRddList.add(tmpRdd);
-      tmpRdd = tmpRdd.parentRdd;
+    if (targetRdd.dependencyType == Common.DependencyType.Wide) {
+      runRddInStage(targetRdd.parentRdd); // Wide dependency, have to materialize parent RDD first
+      int prevNumPartitions = targetRdd.parentRdd.numPartitions;
+      shufflePartitions = new Partition[prevNumPartitions][targetRdd.numPartitions];
+      for (int i = 0; i < prevNumPartitions; ++i) {
+        for (int j = 0; j < targetRdd.numPartitions; ++j) {
+          shufflePartitions[i][j].hostName = targetRdd.partitions.get(i).hostName;
+          shufflePartitions[i][j].partitionId = getPartitionId();
+        }
+      }
+      for (int i = 0; i < prevNumPartitions; ++i) {
+        Partition parentPartition = targetRdd.parentRdd.partitions.get(i);
+        ArrayList<Integer> shufflePartitionIds = new ArrayList<>();
+        for (int j = 0; j < targetRdd.numPartitions; ++j) {
+          shufflePartitionIds.add(shufflePartitions[i][j].partitionId);
+        }
+        DoJobArgs args = new DoJobArgs(WorkerOpType.HashSplit,  -1, parentPartition.partitionId, -1, "", targetRdd.function, shufflePartitionIds, null, null);
+        this.master.assignJob(parentPartition.hostName, args);
+      }
+
+    } else {
+      runRddInStage(targetRdd);
     }
-    Collections.reverse(sortedRddList);
-    for (Rdd rdd: sortedRddList) {
-      runRddInStage(rdd);
-    }*/
-    runRddInStage(targetRdd);
   }
 
   public Object computeRdd(Rdd rdd, Common.OperationType operationType, String function) throws TException, IOException {
@@ -109,7 +130,7 @@ public class Scheduler {
         ArrayList<String> result = new ArrayList<String>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, -1, "", "");
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetSplit, partition.partitionId, -1, -1, "", "", null, null, null);
 
           DoJobReply reply = this.master.assignJob(partition.hostName, args);
           result.addAll(reply.lines);
@@ -119,7 +140,7 @@ public class Scheduler {
         ArrayList<StringIntPair> pairResult = new ArrayList<StringIntPair>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs(WorkerOpType.GetPairSplit, partition.partitionId, -1, -1, "", "");
+          DoJobArgs args = new DoJobArgs(WorkerOpType.GetPairSplit, partition.partitionId, -1, -1, "", "", null, null, null);
 
           DoJobReply reply = this.master.assignJob(partition.hostName, args);
           pairResult.addAll(reply.pairs);
