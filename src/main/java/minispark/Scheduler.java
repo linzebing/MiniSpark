@@ -117,7 +117,7 @@ public class Scheduler {
         DoJobArgs args = new DoJobArgs(WorkerOpType.HashSplit,  -1, parentPartition.partitionId, -1, "", targetRdd.function, shufflePartitionIds, null, null);
         this.master.assignJob(parentPartition.hostName, args);
       }
-
+      runRddInStage(targetRdd);
     } else {
       runRddInStage(targetRdd);
     }
