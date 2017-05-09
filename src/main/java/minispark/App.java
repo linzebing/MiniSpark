@@ -31,7 +31,7 @@ public class App {
 
   public static void main(String[] args) throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
-    Rdd lines = sc.textFile("webhdfs://ec2-34-201-31-106.compute-1.amazonaws.com/test.txt");
+    Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
     Rdd pairs = lines.flatMap("flatMapTest").map("mapTest").mapPair("mapCount").reduceByKey("reduceByKeyTest");
 
     List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
