@@ -52,8 +52,22 @@ public class HdfsSplitReader {
     return result;
   }
 
+  static class Test {
+    String str;
+    int num;
+    Test(String _str, int _num) {
+      str = _str;
+      num = _num;
+    }
+  }
+
+  public static void test(final Test test) {
+    test.num = 2;
+  }
+
   public static void main(String[] args) throws IOException {
-    ArrayList<String>[] arr = (ArrayList<String>[]) new ArrayList[3];
-    System.out.println(arr[0].size());
+    Test t = new Test("66", 66);
+    test(t);
+    System.out.println(t.num);
   }
 }

@@ -112,6 +112,9 @@ public class Scheduler {
     for (int i = 0; i < targetRdd.numPartitions; ++i) {
       final int index = i;
       threads[i] = new Thread(new Runnable() {
+
+
+
         public void run() {
           try {
             runPartitionRecursively(targetRdd, index);
