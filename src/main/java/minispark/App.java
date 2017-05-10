@@ -41,9 +41,9 @@ public class App {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
         .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
-    List<String> output = (List<String>) lines.collect();
-    for (String pair: output) {
-      System.out.println(pair.toString());
+    List<StringIntPair> output = (List<StringIntPair>) lines.collect();
+    for (StringIntPair pair: output) {
+      System.out.println(pair.str + " " + pair.num);
     }
   }
 
