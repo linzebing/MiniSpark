@@ -36,9 +36,9 @@ public class App {
   public static void main(String[] args) throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
-    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest").mapPair("mapCount");
+    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest");
 
-    System.out.println("Count result: " + pairs.reduceByKey("reduceByKeyTest").count());
+    System.out.println("Count result: " + pairs.mapPair("mapCount").reduceByKey("reduceByKeyTest").count());
 
     Rdd filteredPair = pairs.filter("filterTest");
 
