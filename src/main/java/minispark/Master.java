@@ -44,9 +44,9 @@ public class Master {
   }
 
   public DoJobReply assignJob(String hostName, DoJobArgs args) throws TException {
-    System.out.println(args.toString());
+    //System.out.println(args.toString());
     DoJobReply reply = clients.get(hostName).doJob(args);
-    System.out.println(reply.toString());
+    //System.out.println(reply.toString());
 
     return reply;
   }
