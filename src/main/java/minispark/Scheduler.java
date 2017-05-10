@@ -106,10 +106,28 @@ public class Scheduler {
     runPartition(targetRdd, index);
   }
 
-  public void runRddInStage(Rdd targetRdd) throws TException, IOException {
+  public void runRddInStage(final Rdd targetRdd) throws TException, IOException {
     // TODO: should be multithreaded
+    Thread[] threads = new Thread[targetRdd.numPartitions];
     for (int i = 0; i < targetRdd.numPartitions; ++i) {
-      runPartitionRecursively(targetRdd, i);
+      final int index = i;
+      threads[i] = new Thread(new Runnable() {
+        public void run() {
+          try {
+            runPartitionRecursively(targetRdd, index);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      });
+      threads[i].start();
+    }
+    for (int i = 0; i < targetRdd.numPartitions; ++i) {
+      try {
+        threads[i].join();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
   }
 
