@@ -59,7 +59,6 @@ public class Worker {
   }
 
   public static ArrayList<StringIntPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
-    // TODO: choose client according to hostName
     assert inputIds.size() == inputHostNames.size();
     int size = inputIds.size();
     ArrayList<StringIntPair> everything = new ArrayList<>();

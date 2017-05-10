@@ -39,12 +39,17 @@ public class App {
 
   public static void wordCount() throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
-    Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
+    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
         .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
-    List<StringIntPair> output = (List<StringIntPair>) lines.collect();
-    for (StringIntPair pair: output) {
-      System.out.println(pair.str + " " + pair.num);
-    }
+    Long start = System.currentTimeMillis();
+    /*List<StringIntPair> output = (List<StringIntPair>)*/ lines.collect();
+    //for (StringIntPair pair: output) {
+    //
+    //System.out.println(pair.str + " " + pair.num);
+    //}
+    Long end = System.currentTimeMillis();
+    System.out.println("Used " + (end - start) / 1000 + " seconds");
+    sc.stop();
   }
 
   public static boolean monteCarlo(String s) {
@@ -65,11 +70,7 @@ public class App {
   }
 
   public static void main(String[] args) throws IOException, TException {
-    Long start = System.currentTimeMillis();
-    //wordCount();
-    calcPi();
-    Long end = System.currentTimeMillis();
-    System.out.println("Used " + (end - start) / 1000 + " seconds");
-
+    wordCount();
+    //calcPi();
   }
 }

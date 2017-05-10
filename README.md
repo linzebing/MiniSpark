@@ -6,6 +6,76 @@ permalink: /MiniSpark/
 
 Team member: Zebing Lin (zebingl)
 
+# Final
+
+## Summary
+  I implemented a mini Spark-like framework named MiniSpark that can run on top of a HDFS cluster. MiniSpark supports operators including
+*Map*, *FlatMap*, *MapPair*, *Reduce*, *ReduceByKey*, *Collect*, *Count*, *Parallelize* and *Filter*.
+## Technical Challenges
+
+## Preliminary Results
+  MiniSpark is able to run data analytics applications parallelly and distributedly on top of a HDFS cluster.
+
+  A sample program that counts the words that starts/ends with "**instagram**" (case insensitive) is like the following:
+```java
+    public static String mapTest(String s) {
+      return s.toLowerCase();
+    }
+
+    public static ArrayList<String> flatMapTest(String s) {
+      return new ArrayList<String>(Arrays.asList(s.split(" ")));
+    }
+
+    public static int reduceByKeyTest(int a, int b) {
+      return a + b;
+    }
+
+    public static StringIntPair mapCount(String s) {
+      return new StringIntPair(s, 1);
+    }
+
+    SparkContext sc = new SparkContext("Example");
+    Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
+        .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
+    List<StringIntPair> output = (List<StringIntPair>) lines.collect();
+    for (StringIntPair pair: output) {
+      System.out.println(pair.str + " " + pair.num);
+    }
+    sc.stop();
+```
+
+  A sample program that estimates π by "throwing darts" at a circle is like the following:
+```java
+  SparkContext sc = new SparkContext("Example");
+  int NUM_SAMPLES = 20170510;
+  ArrayList<String> l = new ArrayList<>();
+  for (int i = 0; i < NUM_SAMPLES; ++i) {
+    l.add(String.valueOf(i));
+  }
+  System.out.println("Pi is roughly " + 4.0 * sc.parallelize(l).filter("monteCarlo").count() / NUM_SAMPLES);
+  sc.stop();
+```
+## Final Numbers to Show
+  Should be able to run a small demo then.
+
+  More performance numbers to compare against Spark's performance on the same application under the same cluster configuration.
+
+  More performance numbers to test MiniSpark's scalability, i.e., how its performance changes on the same application from 2 workers to
+16 workers.
+
+# Schedule (Updated on May 10th)
+## By Apr. 30th (Done)
+  Finish *Map*, *FlatMap*, *Reduce* and *ReduceByKey* on the worker side. Get sample apps running.
+
+## By May. 5th (Done)
+  Finish basic parallelism on both scheduler and workers.
+
+## By May. 8th (Still ongoing)
+  Optimize job assignments and scheduling.
+
+## By May. 11th
+  Benchmark and write report.
+
 # Summary
 Java implementation of the fast in-memory cluster computing framework [Spark](http://spark.apache.org/), supporting
 a subset of Spark's operators, like *Map*, *FlatMap*, *Reduce*, *ReduceByKey*, *Collect*, etc.
@@ -32,17 +102,8 @@ Substantial communication is involved in Spark execution. For instance, master/s
 make scheduling and task assignment decisions, master has to pass function literals to workers, workers may read data from other workers'
 local memory. How to elegantly design APIs to enable these communications using RPC calls is a challenge.
 
-## Fault Tolerance (if time permits)
-If partions of RDDs get lost, they have to be recomputed according to the lineage information.
-If a worker crashes, the master has to reassign the jobs to other workers.
-What's more, master may also fail, RPC calls may timeout. How to effectively deal with failures is a big challenge.
-
 # Resources
-I will start from scratch to build MiniSpark. Thanks to projects in 15619 and 15719, I'm very familiar with Spark usage, and HDFS as well.
-However, it's still substantial efforts for a single-member team, therefore, I will
-refer to the source code of [Apache Spark](https://github.com/apache/spark) (which is mainly written in Scala)
-for high-level design decision making. I will also refer to [Phoenix](https://github.com/kozyraki/phoenix), which
-is an implementation of MapReduce for shared memory systems.
+I will start from scratch to build MiniSpark. Thanks to projects in 15619 and 15719, I'm very familiar with Spark usage, and HDFS as well. I will mainly refer to [Spark Documentation](http://spark.apache.org/docs/latest/programming-guide.html) to familarize myself with Spark's API interfaces.
 
 Also, the following papers are valuable references that elaborate the ideas behind Spark.
 
@@ -58,33 +119,17 @@ AWS is an ideal platform for me as I can quickly set up HDFS on multiple nodes. 
 - Support operators including *Map*, *FlatMap*, *Reduce*, *ReduceByKey*, *Filter* and *Collect*.
 - Provide easy-to-use APIs to application programmers and able to operate on a cluster.
 - Design intelligent scheduling strategies and make full use of the cores of each node.
-- Achieve comparable (or even better) performance as Apache Spark on sample application tests, like word counts, histograms, PageRank and logistic regression.
-
 
 ## Hope to Achieve (if time permits)
 - Support configuration of reading from local files and communicating using shared memory instead of network messages when operating on a single node.
 - Support more complicated operators.
 - Support RDD fault tolerance and worker fault tolerance.
 
+## Evaluation Plan
+- Achieve **comparable performance** as Apache Spark on sample applications, like word counts, histograms, PageRank and logistic regression.
+- Achieve **better performance** than Spark on a single node (data locality + communication using shared memory should be better).
+
 # Platform
 I plan to use Java for this project. While C++ is more performant than Java, considering that I work alone, Java enables
 faster development of prototypes. Also, as Apache Spark is implemented in Scala, the benchmark comparison will be more fair
 as they are both JVM-based languages.
-
-# Schedule
-I have around four weeks to do this project.
-## Week1
-- Design APIs and overall architecture of MiniSpark.
-
-## Week2
-- Implement workers for forementioned operators.
-
-## Week3
-- Implement a scheduler with high performance.
-
-## Week4
-- Experiment implementation on AWS and adjust scheduling strategies.
-- Benchmark with Apache Spark implementation.
-
-## Rest
-- Write final report.

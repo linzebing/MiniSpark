@@ -39,7 +39,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         if (hashMap.containsKey(args.partitionId)) {
           reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
         } else {
-          // TODO: I don't know
           System.out.println("GetSplit Exception");
         }
         break;
@@ -48,7 +47,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         if (hashMap.containsKey(args.partitionId)) {
           reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
         } else {
-          // TODO: I don't know
           System.out.println("GetPairSplit Exception");
         }
         break;
