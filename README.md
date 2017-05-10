@@ -1,9 +1,3 @@
----
-layout: page
-title: MiniSpark
-permalink: /MiniSpark/
----
-
 Team member: Zebing Lin (zebingl)
 
 # Final
