@@ -50,6 +50,6 @@ public class App {
       System.out.println(pair.toString());
     }
 
-    System.out.println(pairs.reduce("reduceByKeyTest"));
+    System.out.println(pairs.mapPair("mapCount").reduce("reduceByKeyTest"));
   }
 }
