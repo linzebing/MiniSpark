@@ -25,7 +25,10 @@ public class Scheduler {
   public void runPartition(Rdd targetRdd, int index) throws TException {
     DoJobArgs args = null;
     Partition partition = targetRdd.partitions.get(index);
-    Partition parentPartition = targetRdd.parentRdd == null ? null: targetRdd.parentRdd.partitions.get(index);
+    Partition parentPartition = null;
+    if (targetRdd.operationType != Common.OperationType.ReduceByKey) {
+      parentPartition = targetRdd.parentRdd == null ? null: targetRdd.parentRdd.partitions.get(index);
+    }
     switch (targetRdd.operationType) {
       case Parallelize:
         args = new DoJobArgs();
