@@ -125,6 +125,9 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           break;
         }
         ArrayList<StringIntPair>[] hashedResults = new ArrayList[size];
+        for (int i = 0; i < size; ++i) {
+          hashedResults[i] = new ArrayList<>();
+        }
         for (StringIntPair pair: (ArrayList<StringIntPair>) hashMap.get(args.inputId)) {
           hashedResults[pair.str.hashCode() % size].add(pair);
         }

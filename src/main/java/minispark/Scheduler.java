@@ -104,8 +104,7 @@ public class Scheduler {
       shufflePartitions = new Partition[prevNumPartitions][targetRdd.numPartitions];
       for (int i = 0; i < prevNumPartitions; ++i) {
         for (int j = 0; j < targetRdd.numPartitions; ++j) {
-          shufflePartitions[i][j].hostName = targetRdd.partitions.get(i).hostName;
-          shufflePartitions[i][j].partitionId = getPartitionId();
+          shufflePartitions[i][j] = new Partition(getPartitionId(), targetRdd.partitions.get(i).hostName);
         }
       }
       for (int i = 0; i < prevNumPartitions; ++i) {
