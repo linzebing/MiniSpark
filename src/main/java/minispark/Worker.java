@@ -25,6 +25,8 @@ import tutorial.WorkerService;
  */
 public class Worker {
 
+  public static String masterDNS = "ec2-34-201-24-238.compute-1.amazonaws.com";
+
   public static WorkerService.Client client;
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
@@ -37,17 +39,18 @@ public class Worker {
         simple(processor);
       }
     };
+    /*
     Runnable simple2 = new Runnable() {
       public void run() {
         simple2(processor);
       }
-    };
+    };*/
 
     new Thread(simple).start();
-    new Thread(simple2).start();
-    Thread.sleep(1000);
+    //new Thread(simple2).start();
+    //Thread.sleep(1000);
 
-    TTransport transport = new TSocket("localhost", 9099);
+    TTransport transport = new TSocket(masterDNS, 9090);
     transport.open();
 
     TProtocol protocol = new TBinaryProtocol(transport);
@@ -68,10 +71,10 @@ public class Worker {
   public static void simple(WorkerService.Processor processor) {
     try {
       TServerTransport serverTransport = new TServerSocket(9090);
-      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
+      //TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 
       // Use this for a multithreaded server
-      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+      TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
 
       System.out.println("Starting the simple server...");
       server.serve();
@@ -80,6 +83,7 @@ public class Worker {
     }
   }
 
+  /*
   public static void simple2(WorkerService.Processor processor) {
     try {
       TServerTransport serverTransport = new TServerSocket(9099);
@@ -93,5 +97,5 @@ public class Worker {
     } catch (Exception e) {
       e.printStackTrace();
     }
-  }
+  }*/
 }

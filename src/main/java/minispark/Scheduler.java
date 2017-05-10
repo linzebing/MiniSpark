@@ -67,8 +67,9 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         args.funcName = targetRdd.function;
         args.hdfsSplitId = index;
+        targetRdd.partitions.get(index).hostName = Master.workerDNSs[0];
         // TODO: random pick a host name is OK
-        this.master.assignJob("randomPickAhostName", args);
+        this.master.assignJob(Master.workerDNSs[0], args);
         break;
       case Reduce:
 

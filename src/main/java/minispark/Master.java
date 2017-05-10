@@ -15,21 +15,29 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import tutorial.WorkerService;
 
+import java.util.HashMap;
+
 public class Master {
 
   // TODO: use multiple clients
-  WorkerService.Client client;
+  HashMap<String, WorkerService.Client> clients;
+
+  public static String[] workerDNSs = {
+      "ip-172-31-79-126.ec2.internal",
+      "ip-172-31-67-252.ec2.internal"
+  };
 
 
   public Master(String address, String port) {
     try {
-      TTransport transport = new TSocket("localhost", 9090);
-      transport.open();
+      clients = new HashMap<>();
 
-      TProtocol protocol = new  TBinaryProtocol(transport);
-      client = new WorkerService.Client(protocol);
-
-      //transport.close();
+      for (String workerDNS: workerDNSs) {
+        TTransport transport = new TSocket(workerDNS, 9090);
+        transport.open();
+        TProtocol protocol = new  TBinaryProtocol(transport);
+        clients.put(workerDNS, new WorkerService.Client(protocol));
+      }
     } catch (TException x) {
       x.printStackTrace();
     }
@@ -37,7 +45,7 @@ public class Master {
 
   public DoJobReply assignJob(String hostName, DoJobArgs args) throws TException {
     System.out.println(args.toString());
-    DoJobReply reply = client.doJob(args);
+    DoJobReply reply = clients.get(hostName).doJob(args);
     System.out.println(reply.toString());
 
     return reply;
