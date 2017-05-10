@@ -26,6 +26,14 @@ public class WorkerServiceHandler implements WorkerService.Iface {
   public DoJobReply doJob(DoJobArgs args) throws TException {
     DoJobReply reply = new DoJobReply();
     switch (args.workerOpType) {
+      case ParaJob:
+        System.out.println("Received ParaJob");
+        assert !args.inputHostNames.isEmpty();
+        if (hashMap.containsKey(args.partitionId)) {
+          System.out.println("Already exists");
+        } else {
+          hashMap.put(args.partitionId, args.inputHostNames);
+        }
       case GetSplit:
         System.out.println("Received GetSplit");
         if (hashMap.containsKey(args.partitionId)) {

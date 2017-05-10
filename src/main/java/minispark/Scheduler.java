@@ -27,6 +27,14 @@ public class Scheduler {
     Partition partition = targetRdd.partitions.get(index);
     Partition parentPartition = targetRdd.parentRdd == null ? null: targetRdd.parentRdd.partitions.get(index);
     switch (targetRdd.operationType) {
+      case Parallelize:
+        args = new DoJobArgs();
+        args.workerOpType = WorkerOpType.ParaJob;
+        args.partitionId = partition.partitionId;
+        args.inputHostNames = targetRdd.paraArr.subList(index * (targetRdd.paraArr.size() / targetRdd.partitions.size()), Math.min(targetRdd.paraArr.size(), (index + 1) * (targetRdd.paraArr.size() / targetRdd.partitions.size())));
+        targetRdd.partitions.get(index).hostName = Master.workerDNSs[index % Master.workerDNSs.length];
+        this.master.assignJob(Master.workerDNSs[index % Master.workerDNSs.length], args);
+        break;
       case HdfsFile:
         assert(partition.hostName.equals(""));
 

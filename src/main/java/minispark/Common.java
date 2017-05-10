@@ -19,7 +19,7 @@ public class Common {
   }
 
   public enum OperationType {
-    Map, FlatMap, Reduce, ReduceByKey, Filter, Collect, PairCollect, HdfsFile, MapPair, FilterPair, Count
+    Map, FlatMap, Reduce, ReduceByKey, Filter, Collect, PairCollect, HdfsFile, MapPair, FilterPair, Count, Parallelize
   }
 
   public static int getPartitionId() {
