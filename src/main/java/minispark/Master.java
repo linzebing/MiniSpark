@@ -23,8 +23,7 @@ public class Master {
   HashMap<WorkerService.Client, Boolean> availableMap;
   public static final int numClientsPerWorker = 4;
   public static final int sleepTime = 5000;
-
-  Object lock;
+  public static final Object lock = new Object();
 
   public static String[] workerDNSs = {
       "ip-172-31-79-126.ec2.internal",
@@ -34,7 +33,6 @@ public class Master {
 
   public Master(String address, String port) {
     try {
-      lock = new Object();
       clients = new HashMap<>();
 
       for (String workerDNS: workerDNSs) {
@@ -53,8 +51,8 @@ public class Master {
   }
 
   public DoJobReply assignJob(String hostName, DoJobArgs args) throws TException {
-    int index = -1;
     while (true) {
+      int index = -1;
       synchronized (lock) {
         for (int i = 0; i < numClientsPerWorker; ++i) {
           if (availableMap.get(clients.get(hostName)[i])) {
@@ -69,6 +67,9 @@ public class Master {
         DoJobReply reply = null;
         synchronized (clients.get(hostName)[index]) {
           reply = clients.get(hostName)[index].doJob(args);
+        }
+        synchronized (lock) {
+          availableMap.put(clients.get(hostName)[index], true);
         }
         return reply;
       } else {
