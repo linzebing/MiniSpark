@@ -174,7 +174,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           hashedResults[i] = new ArrayList<>();
         }
         for (StringIntPair pair: (ArrayList<StringIntPair>) hashMap.get(args.inputId)) {
-          hashedResults[pair.str.hashCode() % size].add(pair);
+          hashedResults[Math.abs(pair.str.hashCode()) % size].add(pair);
         }
         for (int i = 0; i < size; ++i) {
           hashMap.put(args.shufflePartitionIds.get(i), hashedResults[i]);
