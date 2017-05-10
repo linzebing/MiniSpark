@@ -47,9 +47,19 @@ public class App {
     }
   }
 
+  public static void calcPi() throws IOException, TException {
+    SparkContext sc = new SparkContext("Example");
+    ArrayList<String> l = new ArrayList<>(10);
+    for (int i = 0; i < 10; ++i) {
+      l.add(String.valueOf(i));
+    }
+    System.out.println((List<String>)sc.parallelize(l).collect());
+  }
+
   public static void main(String[] args) throws IOException, TException {
     Long start = System.currentTimeMillis();
-    wordCount();
+    //wordCount();
+    calcPi();
     Long end = System.currentTimeMillis();
     System.out.println("Used " + (end - start) / 1000 + "seconds");
 
