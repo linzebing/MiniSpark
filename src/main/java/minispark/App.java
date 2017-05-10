@@ -48,7 +48,10 @@ public class App {
   }
 
   public static void main(String[] args) throws IOException, TException {
+    Long start = System.currentTimeMillis();
     wordCount();
+    Long end = System.currentTimeMillis();
+    System.out.println("Used " + (end - start) / 1000 + "seconds");
     // SparkContext sc = new SparkContext("Example");
     /*
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
