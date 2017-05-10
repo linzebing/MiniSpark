@@ -26,8 +26,8 @@ public class Master {
   public static final Object lock = new Object();
 
   public static String[] workerDNSs = {
-      "ip-172-31-79-126.ec2.internal",
-      "ip-172-31-67-252.ec2.internal"
+      "ip-172-31-38-114.ec2.internal",
+      "ip-172-31-38-42.ec2.internal"
   };
 
 
