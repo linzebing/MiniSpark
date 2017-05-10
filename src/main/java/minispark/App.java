@@ -44,9 +44,9 @@ public class App {
 
     System.out.println("FIltered Count result: " + pairs.count());
 
-    List<StringIntPair> output = (List<StringIntPair>) filteredPair.collect();
+    List<String> output = (List<String>) filteredPair.collect();
 
-    for (StringIntPair pair: output) {
+    for (String pair: output) {
       System.out.println(pair.toString());
     }
 
