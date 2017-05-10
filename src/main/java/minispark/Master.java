@@ -34,6 +34,7 @@ public class Master {
   public Master(String address, String port) {
     try {
       clients = new HashMap<>();
+      availableMap = new HashMap<>();
 
       for (String workerDNS: workerDNSs) {
         clients.put(workerDNS, new WorkerService.Client[numClientsPerWorker]);
