@@ -4,6 +4,7 @@ import org.apache.thrift.TException;
 import tutorial.*;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import static minispark.Common.getPartitionId;
@@ -43,6 +44,24 @@ public class Scheduler {
         this.master.assignJob(parentPartition.hostName, args);
         partition.hostName = parentPartition.hostName;
         break;
+      case Filter:
+        args = new DoJobArgs();
+        args.workerOpType = WorkerOpType.FilterJob;
+        args.partitionId = partition.partitionId;
+        args.inputId = parentPartition.partitionId;
+        args.funcName = targetRdd.function;
+        this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
+        break;
+      case FilterPair:
+        args = new DoJobArgs();
+        args.workerOpType = WorkerOpType.FilterPairJob;
+        args.partitionId = partition.partitionId;
+        args.inputId = parentPartition.partitionId;
+        args.funcName = targetRdd.function;
+        this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
+        break;
       case MapPair:
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
@@ -74,11 +93,6 @@ public class Scheduler {
         // TODO: random pick a host name is OK
         this.master.assignJob(Master.workerDNSs[0], args);
         break;
-      case Reduce:
-
-        break;
-
-
     }
   }
 
@@ -150,10 +164,39 @@ public class Scheduler {
         }
         return pairResult;
       case Reduce:
-        break;
+        ArrayList<Integer> reduceResults = new ArrayList<>();
+        for (int i = 0; i < rdd.numPartitions; ++i) {
+          Partition partition = rdd.partitions.get(i);
+          DoJobArgs args = new DoJobArgs();
+          args.funcName = function;
+          args.partitionId = partition.partitionId;
+          args.workerOpType = WorkerOpType.ReduceJob;
+          DoJobReply reply = this.master.assignJob(partition.hostName, args);
+          reduceResults.add(reply.reduceResult);
+        }
+        int reduceResult = reduceResults.get(0);
+        for (int i = 1; i < reduceResults.size(); ++i) {
+          try {
+            Method method = App.class.getMethod(function, String.class);
+            reduceResult = (int) method.invoke(null, int.class, int.class);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        return reduceResult;
+      case Count:
+        int countResult = 0;
+        for (int i = 0; i < rdd.numPartitions; ++i) {
+          Partition partition = rdd.partitions.get(i);
+          DoJobArgs args = new DoJobArgs();
+          args.workerOpType = rdd.isPairRdd? WorkerOpType.CountPairJob: WorkerOpType.CountJob;
+          args.partitionId = partition.partitionId;
+          DoJobReply reply = this.master.assignJob(partition.hostName, args);
+          countResult += reply.reduceResult;
+        }
+        return countResult;
     }
 
-
-    return rdd;
+    return null;
   }
 }

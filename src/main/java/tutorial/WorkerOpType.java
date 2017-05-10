@@ -23,7 +23,9 @@ public enum WorkerOpType implements org.apache.thrift.TEnum {
   CountJob(9),
   MapPairJob(10),
   GetPairSplit(11),
-  HashSplit(12);
+  HashSplit(12),
+  CountPairJob(13),
+  FilterPairJob(14);
 
   private final int value;
 
@@ -68,6 +70,10 @@ public enum WorkerOpType implements org.apache.thrift.TEnum {
         return GetPairSplit;
       case 12:
         return HashSplit;
+      case 13:
+        return CountPairJob;
+      case 14:
+        return FilterPairJob;
       default:
         return null;
     }

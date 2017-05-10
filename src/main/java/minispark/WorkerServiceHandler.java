@@ -92,6 +92,46 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           }
         }
         break;
+      case FilterJob:
+        System.out.println("Received FilterJob");
+        if (hashMap.containsKey(args.partitionId)) {
+          // already exists
+        } else {
+          try {
+            Method method = App.class.getMethod(args.funcName, String.class);
+            ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
+            ArrayList<String> output = new ArrayList<>();
+            for (String str: input) {
+              if ((boolean) method.invoke(null, str)) {
+                output.add(str);
+              }
+            }
+            hashMap.put(args.partitionId, output);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        break;
+      case FilterPairJob:
+        System.out.println("Received FilterPairJob");
+        if (hashMap.containsKey(args.partitionId)) {
+          // already exists
+        } else {
+          try {
+            Method method = App.class.getMethod(args.funcName, String.class);
+            ArrayList<StringIntPair> input = (ArrayList<StringIntPair>) hashMap.get(args.inputId);
+            ArrayList<StringIntPair> output = new ArrayList<>();
+            for (StringIntPair str: input) {
+              if ((boolean) method.invoke(null, str)) {
+                output.add(str);
+              }
+            }
+            hashMap.put(args.partitionId, output);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+        break;
       case FlatMapJob:
         System.out.println("Received FlatMapJob");
         if (hashMap.containsKey(args.partitionId)) {
@@ -161,6 +201,37 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             e.printStackTrace();
           }
           hashMap.put(args.partitionId, output);
+        }
+        break;
+      case ReduceJob:
+        if (!hashMap.containsKey(args.partitionId)) {
+          // Output doesn't exist?
+          System.out.println("Reduce on non-materialized data");
+        } else {
+          ArrayList<StringIntPair> tmp = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+          reply.reduceResult = tmp.get(0).num;
+          for (int i = 1; i < tmp.size(); ++i) {
+            try {
+              Method method = App.class.getMethod(args.funcName, int.class, int.class);
+              method.invoke(null, reply.reduceResult, tmp.get(i).num);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        }
+      case CountPairJob:
+        if (!hashMap.containsKey(args.partitionId)) {
+          // Output doesn't exist?
+          System.out.println("CountPair on non-materialized data");
+        } else {
+          reply.reduceResult = ((ArrayList<StringIntPair>) hashMap.get(args.partitionId)).size();
+        }
+      case CountJob:
+        if (!hashMap.containsKey(args.partitionId)) {
+          // Output doesn't exist?
+          System.out.println("Count on non-materialized data");
+        } else {
+          reply.reduceResult = ((ArrayList<String>) hashMap.get(args.partitionId)).size();
         }
     }
     return reply;
