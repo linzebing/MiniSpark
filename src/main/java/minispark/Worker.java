@@ -27,11 +27,18 @@ public class Worker {
 
   public static String masterDNS = "ip-172-31-67-73.ec2.internal";
 
-  public static WorkerService.Client client;
+  public static HashMap<String, WorkerService.Client> clients;
+
+  public static String[] workerDNSs = {
+      "ip-172-31-79-126.ec2.internal",
+      "ip-172-31-67-252.ec2.internal"
+  };
+
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
 
   public static void main(String[] args) throws TTransportException, InterruptedException {
+    clients = new HashMap<>();
     handler = new WorkerServiceHandler();
     processor = new WorkerService.Processor(handler);
     Runnable simple = new Runnable() {
@@ -48,13 +55,14 @@ public class Worker {
 
     new Thread(simple).start();
     //new Thread(simple2).start();
-    //Thread.sleep(1000);
+    Thread.sleep(5000);
 
-    TTransport transport = new TSocket(masterDNS, 9090);
-    transport.open();
-
-    TProtocol protocol = new TBinaryProtocol(transport);
-    client = new WorkerService.Client(protocol);
+    for (String workerDNS: workerDNSs) {
+      TTransport transport = new TSocket(workerDNS, 9090);
+      transport.open();
+      TProtocol protocol = new  TBinaryProtocol(transport);
+      clients.put(workerDNS, new WorkerService.Client(protocol));
+    }
   }
 
   public static ArrayList<StringIntPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
@@ -63,7 +71,7 @@ public class Worker {
     int size = inputIds.size();
     ArrayList<StringIntPair> everything = new ArrayList<>();
     for (int i = 0; i < size; ++i) {
-      everything.addAll(client.readPartition(inputIds.get(i)));
+      everything.addAll(clients.get(inputHostNames.get(i)).readPartition(inputIds.get(i)));
     }
     return everything;
   }
