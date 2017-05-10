@@ -47,7 +47,7 @@ public class App {
     }
   }
 
-  public static boolean monteCarlo() {
+  public static boolean monteCarlo(String s) {
     double x = Math.random();
     double y = Math.random();
     return x * x + y * y < 1;
