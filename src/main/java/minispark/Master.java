@@ -21,7 +21,7 @@ public class Master {
 
   HashMap<String, WorkerService.Client[]> clients;
   HashMap<WorkerService.Client, Boolean> availableMap;
-  public static final int numClientsPerWorker = 2;
+  public static final int numClientsPerWorker = 4;
   public static final int sleepTime = 5000;
 
   Object lock;
