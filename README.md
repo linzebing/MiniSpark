@@ -10,13 +10,34 @@ Team member: Zebing Lin (zebingl)
 
 ## Summary
   I implemented a mini Spark-like framework named MiniSpark that can run on top of a HDFS cluster. MiniSpark supports operators including
-*Map*, *FlatMap*, *MapPair*, *Reduce*, *ReduceByKey*, *Collect*, *Count*, *Parallelize* and *Filter*.
+*Map*, *FlatMap*, *MapPair*, *Reduce*, *ReduceByKey*, *Collect*, *Count*, *Parallelize* and *Filter*. The Github repo is [https://github.com/linzebing/MiniSpark](https://github.com/linzebing/MiniSpark).
+
+  TODO: support for *saveAsTextFile*, *sc.stop()* (which essentially frees the workers' memory), optimization of scheduling and more extensive evaluation are still ongoing.
+
 ## Technical Challenges
 
-## Preliminary Results
-  MiniSpark is able to run data analytics applications parallelly and distributedly on top of a HDFS cluster.
+### Cross-node Communication
+Substantial communication is involved in Spark execution. For instance, master/scheduler has to communcate with workers to
+make scheduling and task assignment decisions, master has to pass function literals to workers, workers may read data from other workers'
+local memory. How to elegantly design APIs to enable these communications using RPC calls is a challenge.
 
-  A sample program that counts the words that starts/ends with "**instagram**" (case insensitive) is like the following:
+Personally I used Apache Thrift to enable RPC communication. Thrift server can be declared to be multithreaded, which enables efficient use of multi cores on the server side. However, thrift client is not thread-safe, therefore it's desirable to set up serveral clients in advance depending on the number of cores on master, and apply synchronization accordingly when being called.
+
+### Module Design
+Although current implementation is only 1K lines of code (thrift-generated code doesn't count), it's substantial efforts to design a distributed program that runs on a cluster.
+
+### Task Scheduling
+When assigning a job, the master should select an available worker based on HDFS data locality, CPU utilization and current running
+jobs into consideration. How to make smart scheduling decisions based on these information is essential to MiniSpark's performance,
+therefore is the major challenge of this project.
+
+Personally, my current implementation exploits data-parallelism on computation of narrowlly dependent RDDs. Schduler keeps track of current running jobs on the workers, and will try to allocate jobs to the least loaded server when possible.
+
+
+## Preliminary Results
+  MiniSpark is able to run data analytics applications parallelly and distributedly on top of a HDFS cluster. Current evaluation on the following applications shows better performance than python-written programs that implements the same application, but slightly worse than scala-written programs. More intensive evaluation is ongoing.
+
+  A sample program that counts the words that starts/ends with "**instagram**" (case insensitive) is like the following. On a 2-worker (r3.xlarge) setting on a 440MB text [file](https://commoncrawl.s3.amazonaws.com/crawl-data/CC-MAIN-2016-50/segments/1480698540409.8/wet/CC-MAIN-20161202170900-00000-ip-10-31-129-80.ec2.internal.warc.wet.gz), MiniSpark used around 16 seconds while scala-written program used 10 seconds and python-written program used 45 seconds.
 ```java
     public static String mapTest(String s) {
       return s.toLowerCase();
