@@ -13,6 +13,10 @@ import java.util.List;
  */
 public class App {
 
+  public static boolean filterTest(String s) {
+    return (s.hashCode() % 2 == 0);
+  }
+
   public static String mapTest(String s) {
     return s.toLowerCase();
   }
@@ -34,10 +38,18 @@ public class App {
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
     Rdd pairs = lines.flatMap("flatMapTest").map("mapTest").mapPair("mapCount").reduceByKey("reduceByKeyTest");
 
+    System.out.println("Count result: " + pairs.count());
+
+    Rdd filteredPair = pairs.filter("filterTest");
+
+    System.out.println("FIltered Count result: " + filteredPair.count());
+
     List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
 
     for (StringIntPair pair: output) {
       System.out.println(pair.toString());
     }
+
+    System.out.println(pairs.reduce("reduceByKeyTest"));
   }
 }
