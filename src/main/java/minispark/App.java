@@ -13,6 +13,10 @@ import java.util.List;
  */
 public class App {
 
+  public static boolean filterTest(String s) {
+    return (s.hashCode() % 2 == 1);
+  }
+
   public static String mapTest(String s) {
     return s.toLowerCase();
   }
@@ -32,12 +36,20 @@ public class App {
   public static void main(String[] args) throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
-    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest").mapPair("mapCount").reduceByKey("reduceByKeyTest");
+    Rdd pairs = lines.flatMap("flatMapTest").map("mapTest");
 
-    List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
+    System.out.println("Count result: " + pairs.mapPair("mapCount").reduceByKey("reduceByKeyTest").count());
 
-    for (StringIntPair pair: output) {
+    Rdd filteredPair = pairs.filter("filterTest");
+
+    System.out.println("FIltered Count result: " + pairs.count());
+
+    List<String> output = (List<String>) filteredPair.collect();
+
+    for (String pair: output) {
       System.out.println(pair.toString());
     }
+
+    System.out.println(pairs.mapPair("mapCount").reduce("reduceByKeyTest"));
   }
 }

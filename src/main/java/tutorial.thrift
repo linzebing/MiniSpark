@@ -80,7 +80,9 @@ enum WorkerOpType {
   CountJob = 9,
   MapPairJob = 10,
   GetPairSplit = 11,
-  HashSplit = 12
+  HashSplit = 12,
+  CountPairJob = 13,
+  FilterPairJob = 14
 }
 
 struct DoJobArgs {
@@ -102,7 +104,8 @@ struct StringIntPair {
 
 struct DoJobReply {
    1: list<string> lines,
-   2: list<StringIntPair> pairs
+   2: list<StringIntPair> pairs,
+   3: i32 reduceResult
 }
 
 service WorkerService {

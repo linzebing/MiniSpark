@@ -95,12 +95,22 @@ public class Rdd {
     return new Rdd(this.sparkContext, DependencyType.Wide, OperationType.ReduceByKey, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
-  public Rdd count() {
-    return this;
+  public Rdd filter(String _function) {
+    assert !this.isPairRdd;
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.Filter, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
-  public double reduce() {
-    return 0;
+  public Rdd filterPair(String _function) {
+    assert this.isPairRdd;
+    return new Rdd(this.sparkContext, DependencyType.Narrow, OperationType.FilterPair, this, this.numPartitions, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
+  }
+
+  public int count() throws IOException, TException {
+    return (int) this.sparkContext.scheduler.computeRdd(this, OperationType.Count, null);
+  }
+
+  public int reduce(String _function) throws IOException, TException {
+    return (int) this.sparkContext.scheduler.computeRdd(this, OperationType.Reduce, _function);
   }
 
   public Object collect() throws IOException, TException {
