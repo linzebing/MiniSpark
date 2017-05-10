@@ -69,6 +69,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
               output.add((String) method.invoke(null, str));
             }
             hashMap.put(args.partitionId, output);
+            hashMap.remove(args.inputId);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -87,6 +88,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
               output.add((StringIntPair) method.invoke(null, str));
             }
             hashMap.put(args.partitionId, output);
+            hashMap.remove(args.inputId);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -107,6 +109,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
               }
             }
             hashMap.put(args.partitionId, output);
+            hashMap.remove(args.inputId);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -127,6 +130,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
               }
             }
             hashMap.put(args.partitionId, output);
+            hashMap.remove(args.inputId);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -145,6 +149,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
               output.addAll((List<String>) method.invoke(null, str));
             }
             hashMap.put(args.partitionId, output);
+            hashMap.remove(args.inputId);
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -174,6 +179,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         for (int i = 0; i < size; ++i) {
           hashMap.put(args.shufflePartitionIds.get(i), hashedResults[i]);
         }
+        hashMap.remove(args.inputId);
         break;
       case ReduceByKeyJob:
         System.out.println("Received ReduceByKeyJob");
