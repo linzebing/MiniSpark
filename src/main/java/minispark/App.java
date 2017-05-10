@@ -33,8 +33,24 @@ public class App {
     return new StringIntPair(s, 1);
   }
 
-  public static void main(String[] args) throws IOException, TException {
+  public static boolean InstagramOnly(String s) {
+    return s.endsWith("instagram") || s.startsWith("instagram");
+  }
+
+  public static void wordCount() throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
+    Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
+        .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
+    List<String> output = (List<String>) lines.collect();
+    for (String pair: output) {
+      System.out.println(pair.toString());
+    }
+  }
+
+  public static void main(String[] args) throws IOException, TException {
+    wordCount();
+    // SparkContext sc = new SparkContext("Example");
+    /*
     Rdd lines = sc.textFile("webhdfs://ec2-34-201-24-238.compute-1.amazonaws.com/test.txt");
     Rdd pairs = lines.flatMap("flatMapTest").map("mapTest");
 
@@ -51,5 +67,6 @@ public class App {
     }
 
     System.out.println(pairs.mapPair("mapCount").reduce("reduceByKeyTest"));
+    */
   }
 }

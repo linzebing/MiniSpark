@@ -47,7 +47,6 @@ public class HdfsSplitReader {
     ArrayList<String> result = new ArrayList<String>();
 
     while (recordReader.next(key, value)) {
-      System.out.println(value.toString());
       result.add(value.toString());
     }
     return result;
