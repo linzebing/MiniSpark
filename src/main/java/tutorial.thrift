@@ -79,7 +79,8 @@ enum WorkerOpType {
   ReduceByKeyJob = 8,
   CountJob = 9,
   MapPairJob = 10,
-  GetPairSplit = 11
+  GetPairSplit = 11,
+  HashSplit = 12
 }
 
 struct DoJobArgs {
@@ -88,7 +89,10 @@ struct DoJobArgs {
   3: i32 inputId,
   4: i32 hdfsSplitId,
   5: string filePath,
-  6: string funcName
+  6: string funcName,
+  7: list<i32> shufflePartitionIds,
+  8: list<i32> inputIds,
+  9: list<string> inputHostNames
 }
 
 struct StringIntPair {
@@ -102,7 +106,8 @@ struct DoJobReply {
 }
 
 service WorkerService {
-    DoJobReply doJob(1:DoJobArgs jobArgs)
+    DoJobReply doJob(1:DoJobArgs jobArgs),
+    list<StringIntPair> readPartition(1:i32 partitionId)
 }
 
 

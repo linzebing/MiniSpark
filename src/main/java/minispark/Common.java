@@ -22,7 +22,7 @@ public class Common {
     Map, FlatMap, Reduce, ReduceByKey, Filter, Collect, PairCollect, HdfsFile, MapPair
   }
 
-  public static int getPartitionID() {
+  public static int getPartitionId() {
     return counter++;
   }
 }
