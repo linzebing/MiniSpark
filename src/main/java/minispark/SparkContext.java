@@ -9,6 +9,7 @@ import java.util.Date;
  */
 public class SparkContext {
 
+  public static final int numCores = 8;
   public String appName;
   public Scheduler scheduler;
   public Date startTime;
@@ -23,6 +24,12 @@ public class SparkContext {
     ArrayList<ArrayList<String>> hdfsSplitInfo = HdfsSplitReader.HdfsGetSplitInfo(hdfsAddr);
     Rdd rdd = new Rdd(this, Common.DependencyType.Narrow, Common.OperationType.HdfsFile, null, hdfsSplitInfo.size(), null, hdfsSplitInfo, hdfsAddr, false);
 
+    return rdd;
+  }
+
+  public Rdd parallelize(ArrayList<String> arr) {
+    Rdd rdd = new Rdd(this, Common.DependencyType.Narrow, Common.OperationType.Parallelize, null, numCores, null, null, null, false);
+    rdd.paraArr = arr;
     return rdd;
   }
 

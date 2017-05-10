@@ -47,11 +47,29 @@ public class App {
     }
   }
 
+  public static boolean monteCarlo(String s) {
+    double x = Math.random();
+    double y = Math.random();
+    return x * x + y * y < 1;
+  }
+
+  public static void calcPi() throws IOException, TException {
+    SparkContext sc = new SparkContext("Example");
+    int NUM_SAMPLES = 20170510;
+    ArrayList<String> l = new ArrayList<>();
+    for (int i = 0; i < NUM_SAMPLES; ++i) {
+      l.add(String.valueOf(i));
+    }
+    System.out.println("Pi is roughly " + 4.0 * sc.parallelize(l).filter("monteCarlo").count() / NUM_SAMPLES);
+    sc.stop();
+  }
+
   public static void main(String[] args) throws IOException, TException {
     Long start = System.currentTimeMillis();
-    wordCount();
+    //wordCount();
+    calcPi();
     Long end = System.currentTimeMillis();
-    System.out.println("Used " + (end - start) / 1000 + "seconds");
+    System.out.println("Used " + (end - start) / 1000 + " seconds");
 
   }
 }

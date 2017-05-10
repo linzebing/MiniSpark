@@ -52,6 +52,7 @@ public class Rdd {
     By default, RDD is partitioned into numPartions (number of splits in HDFS)
    */
   public ArrayList<Partition> partitions;
+  public ArrayList<String> paraArr;
 
   public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd, int _numPartitions, final String _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath, boolean _isPairRdd) {
     this.sparkContext = _sparkContext;
