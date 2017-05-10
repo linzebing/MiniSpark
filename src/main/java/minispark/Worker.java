@@ -46,15 +46,8 @@ public class Worker {
         simple(processor);
       }
     };
-    /*
-    Runnable simple2 = new Runnable() {
-      public void run() {
-        simple2(processor);
-      }
-    };*/
 
     new Thread(simple).start();
-    //new Thread(simple2).start();
     Thread.sleep(5000);
 
     for (String workerDNS: workerDNSs) {
@@ -90,20 +83,4 @@ public class Worker {
       e.printStackTrace();
     }
   }
-
-  /*
-  public static void simple2(WorkerService.Processor processor) {
-    try {
-      TServerTransport serverTransport = new TServerSocket(9099);
-      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
-
-      // Use this for a multithreaded server
-      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
-
-      System.out.println("Starting the simple server...");
-      server.serve();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }*/
 }

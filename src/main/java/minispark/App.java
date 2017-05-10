@@ -39,11 +39,5 @@ public class App {
     for (StringIntPair pair: output) {
       System.out.println(pair.toString());
     }
-
-    //List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
-
-    //for (StringIntPair pair: output) {
-      //System.out.println(pair.str + " " + pair.num);
-    //}
   }
 }
