@@ -25,11 +25,20 @@ import tutorial.WorkerService;
  */
 public class Worker {
 
-  public static WorkerService.Client client;
+  public static String masterDNS = "ip-172-31-67-73.ec2.internal";
+
+  public static HashMap<String, WorkerService.Client> clients;
+
+  public static String[] workerDNSs = {
+      "ip-172-31-79-126.ec2.internal",
+      "ip-172-31-67-252.ec2.internal"
+  };
+
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
 
   public static void main(String[] args) throws TTransportException, InterruptedException {
+    clients = new HashMap<>();
     handler = new WorkerServiceHandler();
     processor = new WorkerService.Processor(handler);
     Runnable simple = new Runnable() {
@@ -37,21 +46,16 @@ public class Worker {
         simple(processor);
       }
     };
-    Runnable simple2 = new Runnable() {
-      public void run() {
-        simple2(processor);
-      }
-    };
 
     new Thread(simple).start();
-    new Thread(simple2).start();
-    Thread.sleep(1000);
+    Thread.sleep(5000);
 
-    TTransport transport = new TSocket("localhost", 9099);
-    transport.open();
-
-    TProtocol protocol = new TBinaryProtocol(transport);
-    client = new WorkerService.Client(protocol);
+    for (String workerDNS: workerDNSs) {
+      TTransport transport = new TSocket(workerDNS, 9090);
+      transport.open();
+      TProtocol protocol = new  TBinaryProtocol(transport);
+      clients.put(workerDNS, new WorkerService.Client(protocol));
+    }
   }
 
   public static ArrayList<StringIntPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
@@ -60,7 +64,7 @@ public class Worker {
     int size = inputIds.size();
     ArrayList<StringIntPair> everything = new ArrayList<>();
     for (int i = 0; i < size; ++i) {
-      everything.addAll(client.readPartition(inputIds.get(i)));
+      everything.addAll(clients.get(inputHostNames.get(i)).readPartition(inputIds.get(i)));
     }
     return everything;
   }
@@ -68,25 +72,10 @@ public class Worker {
   public static void simple(WorkerService.Processor processor) {
     try {
       TServerTransport serverTransport = new TServerSocket(9090);
-      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
+      //TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 
       // Use this for a multithreaded server
-      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
-
-      System.out.println("Starting the simple server...");
-      server.serve();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void simple2(WorkerService.Processor processor) {
-    try {
-      TServerTransport serverTransport = new TServerSocket(9099);
-      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
-
-      // Use this for a multithreaded server
-      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+      TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
 
       System.out.println("Starting the simple server...");
       server.serve();

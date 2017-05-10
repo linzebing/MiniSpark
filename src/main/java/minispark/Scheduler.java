@@ -41,16 +41,19 @@ public class Scheduler {
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case MapPair:
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case FlatMap:
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.FlatMapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case ReduceByKey:
         int prevNumPartitions = targetRdd.parentRdd.numPartitions;
@@ -67,8 +70,9 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         args.funcName = targetRdd.function;
         args.hdfsSplitId = index;
+        partition.hostName = Master.workerDNSs[0];
         // TODO: random pick a host name is OK
-        this.master.assignJob("randomPickAhostName", args);
+        this.master.assignJob(Master.workerDNSs[0], args);
         break;
       case Reduce:
 
@@ -104,7 +108,7 @@ public class Scheduler {
       shufflePartitions = new Partition[prevNumPartitions][targetRdd.numPartitions];
       for (int i = 0; i < prevNumPartitions; ++i) {
         for (int j = 0; j < targetRdd.numPartitions; ++j) {
-          shufflePartitions[i][j] = new Partition(getPartitionId(), targetRdd.partitions.get(i).hostName);
+          shufflePartitions[i][j] = new Partition(getPartitionId(), targetRdd.parentRdd.partitions.get(i).hostName);
         }
       }
       for (int i = 0; i < prevNumPartitions; ++i) {
