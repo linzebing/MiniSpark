@@ -14,7 +14,7 @@ import java.util.List;
 public class App {
 
   public static boolean filterTest(String s) {
-    return (s.hashCode() % 2 == 0);
+    return (s.hashCode() % 2 == 1);
   }
 
   public static String mapTest(String s) {
@@ -44,7 +44,7 @@ public class App {
 
     System.out.println("FIltered Count result: " + filteredPair.count());
 
-    List<StringIntPair> output = (List<StringIntPair>) pairs.collect();
+    List<StringIntPair> output = (List<StringIntPair>) filteredPair.collect();
 
     for (StringIntPair pair: output) {
       System.out.println(pair.toString());
