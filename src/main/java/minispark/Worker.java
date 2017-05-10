@@ -25,7 +25,7 @@ import tutorial.WorkerService;
  */
 public class Worker {
 
-  public static String masterDNS = "ec2-34-201-24-238.compute-1.amazonaws.com";
+  public static String masterDNS = "ip-172-31-67-73.ec2.internal";
 
   public static WorkerService.Client client;
   public static WorkerServiceHandler handler;
