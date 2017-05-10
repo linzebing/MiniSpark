@@ -52,22 +52,11 @@ public class HdfsSplitReader {
     return result;
   }
 
-  static class Test {
-    String str;
-    int num;
-    Test(String _str, int _num) {
-      str = _str;
-      num = _num;
-    }
-  }
-
-  public static void test(final Test test) {
-    test.num = 2;
-  }
-
   public static void main(String[] args) throws IOException {
-    Test t = new Test("66", 66);
-    test(t);
-    System.out.println(t.num);
+    int NUM_SAMPLES = 20170510;
+    ArrayList<String> l = new ArrayList<>();
+    for (int i = 0; i < NUM_SAMPLES; ++i) {
+      l.add(String.valueOf(i));
+    }
   }
 }

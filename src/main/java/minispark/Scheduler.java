@@ -31,7 +31,8 @@ public class Scheduler {
         args = new DoJobArgs();
         args.workerOpType = WorkerOpType.ParaJob;
         args.partitionId = partition.partitionId;
-        args.inputHostNames = targetRdd.paraArr.subList(index * (targetRdd.paraArr.size() / targetRdd.partitions.size()), Math.min(targetRdd.paraArr.size(), (index + 1) * (targetRdd.paraArr.size() / targetRdd.partitions.size())));
+        int size = targetRdd.partitions.size();
+        args.inputHostNames = targetRdd.paraArr.subList(index * ((targetRdd.paraArr.size() + size - 1) / size), Math.min(targetRdd.paraArr.size(), (index + 1) * ((targetRdd.paraArr.size() + size - 1) / size)));
         targetRdd.partitions.get(index).hostName = Master.workerDNSs[index % Master.workerDNSs.length];
         this.master.assignJob(Master.workerDNSs[index % Master.workerDNSs.length], args);
         break;
