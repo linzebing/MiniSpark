@@ -43,9 +43,8 @@ public class Scheduler {
 
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
 
-        // TODO: should pick a random server here
-        this.master.assignJob(serverList.get(0), args);
-        targetRdd.partitions.get(index).hostName = serverList.get(0);
+        this.master.assignJob(serverList.get(index % serverList.size()), args);
+        targetRdd.partitions.get(index).hostName = serverList.get(index % serverList.size());
         break;
       case Map:
         assert(targetRdd.function.length() != 0);
@@ -98,15 +97,14 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         args.funcName = targetRdd.function;
         args.hdfsSplitId = index;
-        partition.hostName = Master.workerDNSs[0];
+        partition.hostName = Master.workerDNSs[index % Master.workerDNSs.length];
         // TODO: random pick a host name is OK
-        this.master.assignJob(Master.workerDNSs[0], args);
+        this.master.assignJob(Master.workerDNSs[index % Master.workerDNSs.length], args);
         break;
     }
   }
 
   public void runPartitionRecursively(Rdd targetRdd, int index) throws IOException, TException {
-    // TODO: Should be multithreaded
     if (targetRdd.dependencyType != Common.DependencyType.Wide) {
       if (targetRdd.parentRdd != null) {
         runPartitionRecursively(targetRdd.parentRdd, index);
@@ -116,14 +114,10 @@ public class Scheduler {
   }
 
   public void runRddInStage(final Rdd targetRdd) throws TException, IOException {
-    // TODO: should be multithreaded
     Thread[] threads = new Thread[targetRdd.numPartitions];
     for (int i = 0; i < targetRdd.numPartitions; ++i) {
       final int index = i;
       threads[i] = new Thread(new Runnable() {
-
-
-
         public void run() {
           try {
             runPartitionRecursively(targetRdd, index);
