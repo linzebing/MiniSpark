@@ -41,16 +41,19 @@ public class Scheduler {
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.MapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case MapPair:
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.MapPairJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case FlatMap:
         assert(targetRdd.function.length() != 0);
         args = new DoJobArgs(WorkerOpType.FlatMapJob, partition.partitionId, parentPartition.partitionId, -1, "", targetRdd.function, null, null, null);
         this.master.assignJob(parentPartition.hostName, args);
+        partition.hostName = parentPartition.hostName;
         break;
       case ReduceByKey:
         int prevNumPartitions = targetRdd.parentRdd.numPartitions;
@@ -67,7 +70,7 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         args.funcName = targetRdd.function;
         args.hdfsSplitId = index;
-        targetRdd.partitions.get(index).hostName = Master.workerDNSs[0];
+        partition.hostName = Master.workerDNSs[0];
         // TODO: random pick a host name is OK
         this.master.assignJob(Master.workerDNSs[0], args);
         break;
