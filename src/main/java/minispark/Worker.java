@@ -29,7 +29,7 @@ public class Worker {
   public static WorkerServiceHandler handler;
   public static WorkerService.Processor processor;
 
-  public static void main(String[] args) throws TTransportException {
+  public static void main(String[] args) throws TTransportException, InterruptedException {
     handler = new WorkerServiceHandler();
     processor = new WorkerService.Processor(handler);
     Runnable simple = new Runnable() {
@@ -37,10 +37,17 @@ public class Worker {
         simple(processor);
       }
     };
+    Runnable simple2 = new Runnable() {
+      public void run() {
+        simple2(processor);
+      }
+    };
 
     new Thread(simple).start();
+    new Thread(simple2).start();
+    Thread.sleep(1000);
 
-    TTransport transport = new TSocket("localhost", 9090);
+    TTransport transport = new TSocket("localhost", 9099);
     transport.open();
 
     TProtocol protocol = new TBinaryProtocol(transport);
@@ -61,6 +68,21 @@ public class Worker {
   public static void simple(WorkerService.Processor processor) {
     try {
       TServerTransport serverTransport = new TServerSocket(9090);
+      TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
+
+      // Use this for a multithreaded server
+      // TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));
+
+      System.out.println("Starting the simple server...");
+      server.serve();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void simple2(WorkerService.Processor processor) {
+    try {
+      TServerTransport serverTransport = new TServerSocket(9099);
       TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 
       // Use this for a multithreaded server

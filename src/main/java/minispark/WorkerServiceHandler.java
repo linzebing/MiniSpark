@@ -153,7 +153,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           }
           ArrayList<StringIntPair> output = new ArrayList<>();
           try {
-            Method method = App.class.getMethod(args.funcName, String.class);
+            Method method = App.class.getMethod(args.funcName, int.class, int.class);
             for (String key: kvStore.keySet()) {
               output.add(new StringIntPair(key, reduceHelper(method, kvStore.get(key))));
             }
