@@ -399,6 +399,14 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
       }
     }
+    System.out.println("strResult");
+    for (String s: strResult) {
+      System.out.println(s);
+    }
+    System.out.println("strIntPair");
+    for (StringIntPair pr: pairResult) {
+      System.out.println(pr.toString());
+    }
     reply.lines = strResult;
     reply.pairs = pairResult;
     if (!strResult.isEmpty()) {
