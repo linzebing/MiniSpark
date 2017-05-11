@@ -344,6 +344,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           pairTmp = null;
           preserve = true;
           for ( ; i < argsArr.size(); ++i) {
+            args = argsArr.get(i);
             switch (args.workerOpType) {
               case MapJob:
                 try {
