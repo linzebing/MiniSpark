@@ -340,9 +340,10 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
       } else {
         for (String flatStr: flatStrs) {
+          strTmp = flatStr;
           pairTmp = null;
+          preserve = true;
           for ( ; i < argsArr.size(); ++i) {
-            strTmp = flatStr;
             switch (args.workerOpType) {
               case MapJob:
                 try {
@@ -407,70 +408,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     }
 
     return reply;
-  }
-
-  public static void dfs(int depth, Object obj, ArrayList<String> strResult, ArrayList<StringIntPair> pairResult, List<DoJobArgs> argsArr) {
-    if (depth == argsArr.size()) {
-      if (obj instanceof StringIntPair) {
-        pairResult.add((StringIntPair) obj);
-      } else {
-        strResult.add((String) obj);
-      }
-    } else {
-      DoJobArgs args = argsArr.get(depth);
-      switch (args.workerOpType) {
-        case MapJob:
-          try {
-            Method method = App.class.getMethod(args.funcName, String.class);
-            dfs(depth + 1, method.invoke(null, (String) obj), strResult, pairResult, argsArr);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          break;
-        case MapPairJob:
-          try {
-            Method method = App.class.getMethod(args.funcName, String.class);
-            dfs(depth + 1, method.invoke(null, (String) obj), strResult, pairResult, argsArr);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          break;
-        case FilterJob:
-          try {
-            Method method = App.class.getMethod(args.funcName, String.class);
-            boolean preserve = (boolean) method.invoke(null, (String) obj);
-            if (preserve) {
-              // break directly
-              dfs(depth + 1, obj, strResult, pairResult, argsArr);
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          break;
-        case FilterPairJob:
-          try {
-            Method method = App.class.getMethod(args.funcName, StringIntPair.class);
-            boolean preserve = (boolean) method.invoke(null, (StringIntPair) obj);
-            if (preserve) {
-              // break directly
-              dfs(depth + 1, obj, strResult, pairResult, argsArr);
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          break;
-        case FlatMapJob:
-          try {
-            Method method = App.class.getMethod(args.funcName, String.class);
-            for (String str: (List<String>) method.invoke(null, obj)) {
-              dfs(depth + 1, str, strResult, pairResult, argsArr);
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          break;
-      }
-    }
   }
 
   public static int reduceHelper(Method method, ArrayList<Integer> values) {
