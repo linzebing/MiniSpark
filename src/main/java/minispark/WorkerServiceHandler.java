@@ -344,7 +344,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           pairTmp = null;
           preserve = true;
           int index = i;
-          System.out.println("flatStr: " + flatStr);
           for (; index < argsArr.size(); ++index) {
             args = argsArr.get(index);
             switch (args.workerOpType) {
@@ -352,7 +351,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 try {
                   Method method = App.class.getMethod(args.funcName, String.class);
                   strTmp = (String) method.invoke(null, strTmp);
-                  System.out.println("MapJob: " + strTmp);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -361,7 +359,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 try {
                   Method method = App.class.getMethod(args.funcName, String.class);
                   pairTmp = (StringIntPair) method.invoke(null, strTmp);
-                  System.out.println("MapPairJob: " + pairTmp);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -404,14 +401,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           }
         }
       }
-    }
-    System.out.println("strResult");
-    for (String s: strResult) {
-      System.out.println(s);
-    }
-    System.out.println("strIntPair");
-    for (StringIntPair pr: pairResult) {
-      System.out.println(pr.toString());
     }
     reply.lines = strResult;
     reply.pairs = pairResult;
