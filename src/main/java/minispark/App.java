@@ -34,7 +34,7 @@ public class App {
   }
 
   public static boolean InstagramOnly(String s) {
-    return s.endsWith("instagram") || s.startsWith("instagram");
+    return s.endsWith("15618") || s.startsWith("15618");
   }
 
   public static void wordCount() throws IOException, TException {
