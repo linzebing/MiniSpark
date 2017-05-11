@@ -53,10 +53,43 @@ public class HdfsSplitReader {
   }
 
   public static void main(String[] args) throws IOException {
-    int NUM_SAMPLES = 20170510;
-    ArrayList<String> l = new ArrayList<>();
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-      l.add(String.valueOf(i));
+    Long a = 0L;
+    Long b = 0L;
+    for (int k = 0; k < 10; ++k) {
+      final int num = 1000000;
+      ArrayList<String> arr = new ArrayList<>();
+      ArrayList<String> result = new ArrayList<>();
+      for (int i = 0; i < num; ++i) {
+        arr.add(String.valueOf(i));
+      }
+
+      /*
+      Long start = System.currentTimeMillis();
+      ArrayList<String> arr1 = new ArrayList<>();
+      for (String str: arr) {
+        arr1.add(str.replace('a', 'b'));
+      }
+      ArrayList<String> arr2 = new ArrayList<>();
+      for (String str: arr1) {
+        arr2.add(str.toLowerCase());
+      }
+      ArrayList<String> arr3 = new ArrayList<>();
+      for (String str: arr2) {
+        arr3.add(str.toUpperCase());
+      }
+      Long end = System.currentTimeMillis();
+      b += end - start;
+      */
+
+
+      Long start = System.currentTimeMillis();
+      for (int i = 0; i < num; ++i) {
+        result.add(i, arr.get(i).replace('a', 'b').toLowerCase().toUpperCase());
+      }
+      Long end = System.currentTimeMillis();
+      a += end - start;
     }
+    System.out.println(a);
+    System.out.println(b);
   }
 }

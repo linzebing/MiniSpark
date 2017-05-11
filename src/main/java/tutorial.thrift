@@ -110,7 +110,7 @@ struct DoJobReply {
 }
 
 service WorkerService {
-    DoJobReply doJob(1:DoJobArgs jobArgs),
+    DoJobReply doJob(1:list<DoJobArgs> doJobArgsArr),
     list<StringIntPair> readPartition(1:i32 partitionId)
 }
 
