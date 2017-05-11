@@ -305,8 +305,8 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         case FilterJob:
           try {
             Method method = App.class.getMethod(args.funcName, String.class);
-            boolean filtered = (boolean) method.invoke(null, (String) obj);
-            if (!filtered) {
+            boolean preserve = (boolean) method.invoke(null, (String) obj);
+            if (preserve) {
               // break directly
               dfs(depth + 1, obj, strResult, pairResult, argsArr);
             }
@@ -317,8 +317,8 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         case FilterPairJob:
           try {
             Method method = App.class.getMethod(args.funcName, StringIntPair.class);
-            boolean filtered = (boolean) method.invoke(null, (StringIntPair) obj);
-            if (!filtered) {
+            boolean preserve = (boolean) method.invoke(null, (StringIntPair) obj);
+            if (preserve) {
               // break directly
               dfs(depth + 1, obj, strResult, pairResult, argsArr);
             }
