@@ -292,7 +292,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     Method[] methods = new Method[argsArr.size()];
 
     for (int i = 1; i < argsArr.size(); ++i) {
-      if (argsArr.get(i).workerOpType ==WorkerOpType.MapPairJob || argsArr.get(i).workerOpType == WorkerOpType.FilterPairJob) {
+      if (argsArr.get(i).workerOpType == WorkerOpType.FilterPairJob) {
         try {
           methods[i] = App.class.getMethod(args.funcName, StringIntPair.class);
         } catch (Exception e) {
