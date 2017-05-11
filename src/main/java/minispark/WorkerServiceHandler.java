@@ -8,8 +8,10 @@ import org.apache.thrift.TException;
 import tutorial.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -261,9 +263,140 @@ public class WorkerServiceHandler implements WorkerService.Iface {
 
     ArrayList<String> strResult = new ArrayList<>();
     ArrayList<StringIntPair> pairResult = new ArrayList<>();
+    ArrayList<String> flatStrs = null;
+    for (String strTmp: starter) {
+      StringIntPair pairTmp = null;
+      int i = 1;
+      boolean flatMapped = false;
+      boolean preserve = true;
+      for ( ; i < argsArr.size(); ++i) {
+        args = argsArr.get(i);
+        switch (args.workerOpType) {
+          case MapJob:
+            try {
+              Method method = App.class.getMethod(args.funcName, String.class);
+              strTmp = (String) method.invoke(null, strTmp);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            break;
+          case MapPairJob:
+            try {
+              Method method = App.class.getMethod(args.funcName, String.class);
+              pairTmp = (StringIntPair) method.invoke(null, strTmp);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            break;
+          case FilterJob:
+            try {
+              Method method = App.class.getMethod(args.funcName, String.class);
+              preserve = (boolean) method.invoke(null, strTmp);
+              if (!preserve) {
+                // break directly
+                i = argsArr.size();
+                break;
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            break;
+          case FlatMapJob:
+            flatMapped = true;
+            try {
+              Method method = App.class.getMethod(args.funcName, String.class);
+              flatStrs = (ArrayList<String>) method.invoke(null, strTmp);
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            break;
+          case FilterPairJob:
+            try {
+              Method method = App.class.getMethod(args.funcName, StringIntPair.class);
+              preserve = (boolean) method.invoke(null, pairTmp);
+              if (!preserve) {
+                // break directly
+                i = argsArr.size();
+                break;
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            break;
+        }
+        if (flatMapped) {
+          ++i;
+          break;
+        }
+      }
 
-    for (String str: starter) {
-      dfs(1, str, strResult, pairResult, argsArr);
+      if (i == argsArr.size()) {
+        if (preserve) {
+          if (pairTmp != null) {
+            pairResult.add(pairTmp);
+          } else {
+            strResult.add(strTmp);
+          }
+        }
+      } else {
+        for (String flatStr: flatStrs) {
+          pairTmp = null;
+          for ( ; i < argsArr.size(); ++i) {
+            strTmp = flatStr;
+            switch (args.workerOpType) {
+              case MapJob:
+                try {
+                  Method method = App.class.getMethod(args.funcName, String.class);
+                  strTmp = (String) method.invoke(null, strTmp);
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                break;
+              case MapPairJob:
+                try {
+                  Method method = App.class.getMethod(args.funcName, String.class);
+                  pairTmp = (StringIntPair) method.invoke(null, strTmp);
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                break;
+              case FilterJob:
+                try {
+                  Method method = App.class.getMethod(args.funcName, String.class);
+                  preserve = (boolean) method.invoke(null, strTmp);
+                  if (!preserve) {
+                    // break directly
+                    i = argsArr.size();
+                    break;
+                  }
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                break;
+              case FilterPairJob:
+                try {
+                  Method method = App.class.getMethod(args.funcName, StringIntPair.class);
+                  preserve = (boolean) method.invoke(null, pairTmp);
+                  if (!preserve) {
+                    // break directly
+                    i = argsArr.size();
+                    break;
+                  }
+                } catch (Exception e) {
+                  e.printStackTrace();
+                }
+                break;
+            }
+          }
+          if (i == argsArr.size() && preserve) {
+            if (pairTmp != null) {
+              pairResult.add(pairTmp);
+            } else {
+              strResult.add(strTmp);
+            }
+          }
+        }
+      }
     }
     reply.lines = strResult;
     reply.pairs = pairResult;
