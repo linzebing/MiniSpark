@@ -28,6 +28,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
   public DoJobReply doJob(List<DoJobArgs> argsArr) throws TException {
     DoJobReply reply = new DoJobReply();
     DoJobArgs args = argsArr.get(argsArr.size() - 1);
+    Long start = System.currentTimeMillis();
     if (argsArr.size() == 1) {
       switch (args.workerOpType) {
         case HashSplit:
@@ -406,13 +407,14 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
       }
     }
-    reply.lines = strResult;
-    reply.pairs = pairResult;
     if (!strResult.isEmpty()) {
       hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, strResult);
     } else {
       hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, pairResult);
     }
+
+    Long end = System.currentTimeMillis();
+    System.out.println("Used time: " + (end - start) / 1000);
 
     return reply;
   }
