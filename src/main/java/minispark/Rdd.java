@@ -93,7 +93,7 @@ public class Rdd {
 
   public Rdd reduceByKey(String _function) {
     assert this.isPairRdd;
-    return new Rdd(this.sparkContext, DependencyType.Wide, OperationType.ReduceByKey, this, SparkContext.numCores, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
+    return new Rdd(this.sparkContext, DependencyType.Wide, OperationType.ReduceByKey, this, SparkContext.numCores * 3, _function, this.hdfsSplitInfo, this.filePath, this.isPairRdd);
   }
 
   public Rdd filter(String _function) {
