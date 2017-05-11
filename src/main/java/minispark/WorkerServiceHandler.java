@@ -343,13 +343,16 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           strTmp = flatStr;
           pairTmp = null;
           preserve = true;
-          for ( ; i < argsArr.size(); ++i) {
-            args = argsArr.get(i);
+          int index = i;
+          System.out.println("flatStr: " + flatStr);
+          for (; index < argsArr.size(); ++index) {
+            args = argsArr.get(index);
             switch (args.workerOpType) {
               case MapJob:
                 try {
                   Method method = App.class.getMethod(args.funcName, String.class);
                   strTmp = (String) method.invoke(null, strTmp);
+                  System.out.println("MapJob: " + strTmp);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -358,6 +361,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 try {
                   Method method = App.class.getMethod(args.funcName, String.class);
                   pairTmp = (StringIntPair) method.invoke(null, strTmp);
+                  System.out.println("MapPairJob: " + pairTmp);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }
@@ -368,7 +372,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                   preserve = (boolean) method.invoke(null, strTmp);
                   if (!preserve) {
                     // break directly
-                    i = argsArr.size();
+                    index = argsArr.size();
                     break;
                   }
                 } catch (Exception e) {
@@ -381,7 +385,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                   preserve = (boolean) method.invoke(null, pairTmp);
                   if (!preserve) {
                     // break directly
-                    i = argsArr.size();
+                    index = argsArr.size();
                     break;
                   }
                 } catch (Exception e) {
@@ -390,7 +394,8 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 break;
             }
           }
-          if (i == argsArr.size() && preserve) {
+
+          if (index == argsArr.size() && preserve) {
             if (pairTmp != null) {
               pairResult.add(pairTmp);
             } else {
