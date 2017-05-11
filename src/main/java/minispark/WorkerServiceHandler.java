@@ -335,6 +335,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           } catch (Exception e) {
             e.printStackTrace();
           }
+          break;
       }
     }
   }
