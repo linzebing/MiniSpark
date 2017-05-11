@@ -15,6 +15,7 @@ import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import tutorial.WorkerService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Master {
@@ -31,7 +32,7 @@ public class Master {
   };
 
 
-  public Master(String address, String port) {
+  public Master() {
     try {
       clients = new HashMap<>();
       availableMap = new HashMap<>();
@@ -51,7 +52,7 @@ public class Master {
     }
   }
 
-  public DoJobReply assignJob(String hostName, DoJobArgs args) throws TException {
+  public DoJobReply assignJob(String hostName, ArrayList<DoJobArgs> args) throws TException {
     while (true) {
       int index = -1;
       synchronized (lock) {

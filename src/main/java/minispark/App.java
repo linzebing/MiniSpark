@@ -42,11 +42,10 @@ public class App {
     Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
         .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
     Long start = System.currentTimeMillis();
-    /*List<StringIntPair> output = (List<StringIntPair>)*/ lines.collect();
-    //for (StringIntPair pair: output) {
-    //
-    //System.out.println(pair.str + " " + pair.num);
-    //}
+    List<StringIntPair> output = (List<StringIntPair>) lines.collect();
+    for (StringIntPair pair: output) {
+      System.out.println(pair.str + " " + pair.num);
+    }
     Long end = System.currentTimeMillis();
     System.out.println("Used " + (end - start) / 1000 + " seconds");
     sc.stop();
