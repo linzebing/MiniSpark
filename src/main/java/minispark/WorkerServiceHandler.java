@@ -267,6 +267,11 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     }
     reply.lines = strResult;
     reply.pairs = pairResult;
+    if (!strResult.isEmpty()) {
+      hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, strResult);
+    } else {
+      hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, pairResult);
+    }
 
     return reply;
   }
