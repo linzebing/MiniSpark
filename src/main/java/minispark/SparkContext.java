@@ -1,8 +1,15 @@
 package minispark;
 
+import org.apache.thrift.TException;
+import tutorial.DoJobArgs;
+import tutorial.WorkerOpType;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+
+import static minispark.Master.workerDNSs;
 
 /**
  * Created by lzb on 4/8/17.
@@ -33,7 +40,11 @@ public class SparkContext {
     return rdd;
   }
 
-  public void stop() {
-
+  public void stop() throws TException {
+    DoJobArgs args = new DoJobArgs();
+    args.workerOpType = WorkerOpType.DelSplit;
+    for (String workerDNS: workerDNSs) {
+      this.scheduler.master.assignJob(workerDNS, new ArrayList<DoJobArgs>(Arrays. asList(args)));
+    }
   }
 }

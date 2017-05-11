@@ -237,6 +237,10 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             }
           }
           return reply;
+        case DelSplit:
+          System.out.println("Received DelSplit");
+          hashMap.clear();
+          return reply;
         default:
           assert false;
       }
