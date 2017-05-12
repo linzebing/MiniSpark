@@ -56,7 +56,7 @@ public class HdfsSplitReader {
     Long start = System.currentTimeMillis();
     double t = 0.0;
     for (int i = 0; i < 80; ++i) {
-      double num = App.monteCarlo("1").num;
+      double num = App.monteCarlo(String.valueOf(i)).num;
       t += num;
       System.out.println(num);
     }

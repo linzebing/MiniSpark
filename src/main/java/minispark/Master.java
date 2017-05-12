@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Master {
   HashMap<String, WorkerService.Client[]> clients;
@@ -58,37 +59,35 @@ public class Master {
   }
 
   public String findLeastLoaded(List<String> arrayList) {
-    int maxNum = -1;
-    String result = "";
-    for (String hostName: arrayList) {
-      synchronized (countsMap) {
+    synchronized (countsMap) {
+      int maxNum = -1;
+      String result = "";
+      for (String hostName: arrayList) {
         int freeNum = countsMap.get(hostName);
         if (freeNum > maxNum) {
           maxNum = freeNum;
           result = hostName;
         }
       }
-    }
-    if (maxNum == -1) {
-      for (String hostName: arrayList) {
-        synchronized (countsMap) {
+      if (maxNum == -1) {
+        for (String hostName: arrayList) {
+
           int freeNum = countsMap.get(hostName);
           if (freeNum > maxNum) {
             maxNum = freeNum;
             result = hostName;
           }
         }
-      }
-      if (maxNum == -1) {
-        return arrayList.get(new Random().nextInt() % arrayList.size());
+        if (maxNum == -1) {
+          return arrayList.get(ThreadLocalRandom.current().nextInt() % arrayList.size());
+        } else {
+          return result;
+        }
       } else {
+
+        countsMap.put(result, countsMap.get(result) - 1);
         return result;
       }
-    } else {
-      synchronized (countsMap) {
-        countsMap.put(result, countsMap.get(result) - 1);
-      }
-      return result;
     }
   }
 
