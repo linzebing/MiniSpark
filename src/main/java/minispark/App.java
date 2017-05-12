@@ -39,7 +39,7 @@ public class App {
       System.out.println(pair.str + " " + (int) pair.num);
     }
     Long end = System.currentTimeMillis();
-    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
+    System.out.println("Time elapsed: " + (end - start) / 1000.0 + "seconds");
     sc.stop();
   }
 
@@ -74,7 +74,7 @@ public class App {
     double sum = sc.parallelize(l).mapPair("monteCarlo").reduce("add");
     Long end = System.currentTimeMillis();
     System.out.println("Estimation of pi is: " + sum / NUM_SAMPLES);
-    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
+    System.out.println("Time elapsed: " + (end - start) / 1000.0 + "seconds");
     sc.stop();
   }
   /******* SparkPi ends *******/
