@@ -17,9 +17,10 @@ import tutorial.WorkerService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 public class Master {
-
   HashMap<String, WorkerService.Client[]> clients;
   HashMap<WorkerService.Client, Boolean> availableMap;
   public static final int numClientsPerWorker = 4;
@@ -49,6 +50,44 @@ public class Master {
       }
     } catch (TException x) {
       x.printStackTrace();
+    }
+  }
+
+  public String findLeastLoaded(List<String> arrayList) {
+    int maxNum = -1;
+    String result = "";
+    for (String hostName: arrayList) {
+      int freeNum = 0;
+      for (int i = 0; i < numClientsPerWorker; ++i) {
+        if ((availableMap.get(clients.get(hostName)[i]))) {
+          ++freeNum;
+        }
+      }
+      if (freeNum > maxNum) {
+        maxNum = freeNum;
+        result = hostName;
+      }
+    }
+    if (maxNum == -1) {
+      for (String hostName: workerDNSs) {
+        int freeNum = 0;
+        for (int i = 0; i < numClientsPerWorker; ++i) {
+          if ((availableMap.get(clients.get(hostName)[i]))) {
+            ++freeNum;
+          }
+        }
+        if (freeNum > maxNum) {
+          maxNum = freeNum;
+          result = hostName;
+        }
+      }
+      if (maxNum == -1) {
+        return arrayList.get(new Random().nextInt() % arrayList.size());
+      } else {
+        return result;
+      }
+    } else {
+      return result;
     }
   }
 

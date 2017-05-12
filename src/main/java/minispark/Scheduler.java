@@ -35,12 +35,12 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         int size = targetRdd.partitions.size();
         args.inputHostNames = targetRdd.paraArr.subList(index * ((targetRdd.paraArr.size() + size - 1) / size), Math.min(targetRdd.paraArr.size(), (index + 1) * ((targetRdd.paraArr.size() + size - 1) / size)));
-        targetRdd.partitions.get(index).hostName = Master.workerDNSs[index % Master.workerDNSs.length];
+        targetRdd.partitions.get(index).hostName = master.findLeastLoaded(Arrays.asList(Master.workerDNSs));
         break;
       case HdfsFile:
         args = new DoJobArgs(WorkerOpType.ReadHdfsSplit, partition.partitionId, -1, index, targetRdd.filePath, "", null, null, null);
         ArrayList<String> serverList = targetRdd.hdfsSplitInfo.get(index);
-        targetRdd.partitions.get(index).hostName = serverList.get(index % serverList.size());
+        targetRdd.partitions.get(index).hostName = master.findLeastLoaded(serverList);
         break;
       case Map:
         assert(targetRdd.function.length() != 0);
@@ -98,8 +98,8 @@ public class Scheduler {
         args.partitionId = partition.partitionId;
         args.funcName = targetRdd.function;
         args.hdfsSplitId = index;
-        partition.hostName = Master.workerDNSs[index % Master.workerDNSs.length];
-        this.master.assignJob(Master.workerDNSs[index % Master.workerDNSs.length], new ArrayList<DoJobArgs>(Arrays. asList(args)));
+        partition.hostName = master.findLeastLoaded(Arrays.asList(Master.workerDNSs));
+        this.master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
         break;
       default:
         assert false;
