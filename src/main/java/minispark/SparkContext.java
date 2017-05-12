@@ -16,7 +16,7 @@ import static minispark.Master.workerDNSs;
  */
 public class SparkContext {
 
-  public static final int numCores = 8;
+  public static final int numCores = Master.numClientsPerWorker * Master.numWorkers;
   public String appName;
   public Scheduler scheduler;
   public Date startTime;

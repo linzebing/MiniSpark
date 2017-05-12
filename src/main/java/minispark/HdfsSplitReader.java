@@ -53,17 +53,16 @@ public class HdfsSplitReader {
   }
 
   public static void main(String[] args) throws IOException {
-
+    Long start = System.currentTimeMillis();
     double t = 0.0;
     for (int i = 0; i < 80; ++i) {
-      Long start = System.currentTimeMillis();
       double num = App.monteCarlo("1").num;
-      Long end = System.currentTimeMillis();
-      System.out.println("Elapsed " + (end - start) / 1000.0);
       t += num;
       System.out.println(num);
     }
     System.out.println(t / 80);
+    Long end = System.currentTimeMillis();
+    System.out.println("Elapsed " + (end - start) / 1000.0);
   }
 }
 
