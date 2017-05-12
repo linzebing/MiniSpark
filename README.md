@@ -10,6 +10,13 @@ Team member: Zebing Lin (zebingl)
 
 ## Technical Challenges
 
+### Task Scheduling
+When assigning a job, the master should select an available worker based on HDFS data locality, CPU utilization and current running
+jobs into consideration. How to make smart scheduling decisions based on these information is essential to MiniSpark's performance,
+therefore is the major challenge of this project.
+
+Personally, my current implementation exploits data-parallelism on computation of narrowlly dependent RDDs. Scheduler keeps track of current running jobs on the workers, and will try to allocate jobs to the least loaded server when possible. **Don't materialize narrowly dependent RDDs. I used to materialize every RDD step by step, but now when *reduceByKey* or an action is incurred, all the narrowly-dependent lineages will be transferred to the worker in one batch, and the transformations will be applied in a streaming fashion. This substantially improves performance (due to locality) and reduces memory footprint. Due to the existence of flatMap, transformations can be applied using a DFS like approach**. 
+
 ### Cross-node Communication
 Substantial communication is involved in Spark execution. For instance, master/scheduler has to communcate with workers to
 make scheduling and task assignment decisions, master has to pass function literals to workers, workers may read data from other workers'
@@ -19,14 +26,6 @@ Personally I used Apache Thrift to enable RPC communication. Thrift server can b
 
 ### Module Design
 Although current implementation is only 1K lines of code (thrift-generated code doesn't count), it's substantial efforts to design a distributed program that runs on a cluster.
-
-### Task Scheduling
-When assigning a job, the master should select an available worker based on HDFS data locality, CPU utilization and current running
-jobs into consideration. How to make smart scheduling decisions based on these information is essential to MiniSpark's performance,
-therefore is the major challenge of this project.
-
-Personally, my current implementation exploits data-parallelism on computation of narrowlly dependent RDDs. Schduler keeps track of current running jobs on the workers, and will try to allocate jobs to the least loaded server when possible.
-
 
 ## Preliminary Results
   MiniSpark is able to run data analytics applications parallelly and distributedly on top of a HDFS cluster. Current evaluation on the following applications shows better performance than python-written programs that implements the same application, but slightly worse than scala-written programs. More intensive evaluation is ongoing.
