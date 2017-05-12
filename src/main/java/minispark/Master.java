@@ -23,10 +23,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Master {
   public static String[] workerDNSs = {
-      "ip-172-31-79-240.ec2.internal",
-      "ip-172-31-65-76.ec2.internal",
-      "ip-172-31-75-170.ec2.internal",
-      "ip-172-31-69-212.ec2.internal",
+      "ip-172-31-75-241.ec2.internal",
+      "ip-172-31-64-149.ec2.internal",
+      "ip-172-31-69-142.ec2.internal",
   };
 
   HashMap<String, WorkerService.Client[]> clients;

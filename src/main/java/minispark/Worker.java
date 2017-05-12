@@ -27,10 +27,9 @@ public class Worker {
   public static HashMap<String, WorkerService.Client> clients;
 
   public static String[] workerDNSs = {
-      "ip-172-31-79-240.ec2.internal",
-      "ip-172-31-65-76.ec2.internal",
-      "ip-172-31-75-170.ec2.internal",
-      "ip-172-31-69-212.ec2.internal",
+      "ip-172-31-75-241.ec2.internal",
+      "ip-172-31-64-149.ec2.internal",
+      "ip-172-31-69-142.ec2.internal",
   };
 
   public static WorkerServiceHandler handler;
@@ -47,7 +46,7 @@ public class Worker {
     };
 
     new Thread(simple).start();
-    Thread.sleep(20000);
+    Thread.sleep(10000);
 
     for (String workerDNS: workerDNSs) {
       TTransport transport = new TSocket(workerDNS, 9090);
