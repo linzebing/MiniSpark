@@ -12,21 +12,8 @@ import java.util.List;
  * Created by lzb on 4/16/17.
  */
 public class App {
-  /******* Histogram begins *******/
-  public static ArrayList<String> extractLetters(String s) {
-    ArrayList<String> result = new ArrayList<>();
-    for (int i = 0; i < s.length(); ++i) {
-      char ch = s.charAt(i);
-      if ('A' <= ch && ch <= 'Z') {
-        result.add(String.valueOf(ch + ('a' - 'A')));
-      } else if ('a' <= ch && ch <= 'z') {
-        result.add(String.valueOf(ch));
-      }
-    }
-    return result;
-  }
-
-  public static String mapTest(String s) {
+  /******* WordCount begins *******/
+  public static String toLower(String s) {
     return s.toLowerCase();
   }
 
@@ -34,7 +21,7 @@ public class App {
     return new ArrayList<String>(Arrays.asList(s.split(" ")));
   }
 
-  public static double reduceByKeyTest(double a, double b) {
+  public static double add(double a, double b) {
     return a + b;
   }
 
@@ -42,49 +29,29 @@ public class App {
     return s.endsWith("15618") || s.startsWith("15618");
   }
 
-  public static void wc() throws IOException, TException {
+  public static void WordCount() throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
     Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
-        .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
+        .map("toLower").filter("InstagramOnly").mapPair("mapCount").reduceByKey("add");
     Long start = System.currentTimeMillis();
     List<StringNumPair> output = (List<StringNumPair>) lines.collect();
     for (StringNumPair pair: output) {
-      System.out.println(pair.str + " " + pair.num);
+      System.out.println(pair.str + " " + (int) pair.num);
     }
     Long end = System.currentTimeMillis();
-    System.out.println("Time elapsed: " + (end - start) / 1000 + " seconds");
+    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
     sc.stop();
-  }
-
-  public static double add(double a, double b) {
-    return a + b;
   }
 
   public static StringNumPair mapCount(String s) {
     return new StringNumPair(s, 1);
   }
 
-  public static void Histogram() throws IOException, TException {
-    SparkContext sc = new SparkContext("WordCount");
-    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt")
-        .flatMap("extractLetters")
-        .mapPair("mapCount")
-        .reduceByKey("add");
-
-    Long start = System.currentTimeMillis();
-    List<StringNumPair> output = (List<StringNumPair>) lines.collect();
-    for (StringNumPair pair: output) {
-      System.out.println(pair.str + " " + pair.num);
-    }
-    Long end = System.currentTimeMillis();
-    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
-    sc.stop();
-  }
-  /******* Histogram ends *******/
+  /******* WordCount ends *******/
 
   /******* SparkPi begins *******/
   public static StringNumPair monteCarlo(String s) {
-    int total = 10000;
+    int total = 250000000;
     int cnt = 0;
     for (int i = 0; i < total; ++i) {
       double x = Math.random();
@@ -97,7 +64,7 @@ public class App {
   }
 
   public static void SparkPi() throws IOException, TException {
-    int NUM_SAMPLES = 20000;
+    int NUM_SAMPLES = 80;
     SparkContext sc = new SparkContext("SparkPi");
     ArrayList<String> l = new ArrayList<>(NUM_SAMPLES);
     for (int i = 0; i < NUM_SAMPLES; ++i) {
@@ -115,7 +82,6 @@ public class App {
 
   public static void main(String[] args) throws IOException, TException {
     //SparkPi();
-    //Histogram();
-    wc();
+    WordCount();
   }
 }

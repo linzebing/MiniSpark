@@ -53,43 +53,25 @@ public class HdfsSplitReader {
   }
 
   public static void main(String[] args) throws IOException {
-    Long a = 0L;
-    Long b = 0L;
-    for (int k = 0; k < 10; ++k) {
-      final int num = 1000000;
-      ArrayList<String> arr = new ArrayList<>();
-      ArrayList<String> result = new ArrayList<>();
-      for (int i = 0; i < num; ++i) {
-        arr.add(String.valueOf(i));
+    Long start = System.currentTimeMillis();
+    Long total = 10000 * (long)Integer.MAX_VALUE;
+    double t = 0.0;
+    for (int i = 0; i < 10000; ++i) {
+      int cnt = 0;
+      for (int j = 0; j < Integer.MAX_VALUE / 10; ++j) {
+        double a = Math.random();
+        double b = Math.random();
+        if (a * a + b * b < 1) {
+          ++cnt;
+        }
       }
+      t += 4.0 * cnt / Integer.MAX_VALUE;
 
-      /*
-      Long start = System.currentTimeMillis();
-      ArrayList<String> arr1 = new ArrayList<>();
-      for (String str: arr) {
-        arr1.add(str.replace('a', 'b'));
-      }
-      ArrayList<String> arr2 = new ArrayList<>();
-      for (String str: arr1) {
-        arr2.add(str.toLowerCase());
-      }
-      ArrayList<String> arr3 = new ArrayList<>();
-      for (String str: arr2) {
-        arr3.add(str.toUpperCase());
-      }
-      Long end = System.currentTimeMillis();
-      b += end - start;
-      */
-
-
-      Long start = System.currentTimeMillis();
-      for (int i = 0; i < num; ++i) {
-        result.add(i, arr.get(i).replace('a', 'b').toLowerCase().toUpperCase());
-      }
-      Long end = System.currentTimeMillis();
-      a += end - start;
+      System.out.println(400.0 * cnt / Integer.MAX_VALUE);
     }
-    System.out.println(a);
-    System.out.println(b);
+    System.out.println(t / 10000);
+    Long end = System.currentTimeMillis();
+    System.out.println("Elapsed " + (end - start) / 10000);
   }
 }
+
