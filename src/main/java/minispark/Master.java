@@ -23,6 +23,7 @@ import java.util.Random;
 public class Master {
   HashMap<String, WorkerService.Client[]> clients;
   HashMap<WorkerService.Client, Boolean> availableMap;
+  HashMap<String, Integer> countsMap;
   public static final int numClientsPerWorker = 4;
   public static final int sleepTime = 100;
   public static final Object lock = new Object();
@@ -37,8 +38,10 @@ public class Master {
     try {
       clients = new HashMap<>();
       availableMap = new HashMap<>();
+      countsMap = new HashMap<>();
 
       for (String workerDNS: workerDNSs) {
+        countsMap.put(workerDNS, numClientsPerWorker);
         clients.put(workerDNS, new WorkerService.Client[numClientsPerWorker]);
         for (int i = 0; i < numClientsPerWorker; ++i) {
           TTransport transport = new TSocket(workerDNS, 9090);
@@ -57,28 +60,22 @@ public class Master {
     int maxNum = -1;
     String result = "";
     for (String hostName: arrayList) {
-      int freeNum = 0;
-      for (int i = 0; i < numClientsPerWorker; ++i) {
-        if ((availableMap.get(clients.get(hostName)[i]))) {
-          ++freeNum;
-        }
-      }
-      if (freeNum > maxNum) {
-        maxNum = freeNum;
-        result = hostName;
-      }
-    }
-    if (maxNum == -1) {
-      for (String hostName: workerDNSs) {
-        int freeNum = 0;
-        for (int i = 0; i < numClientsPerWorker; ++i) {
-          if ((availableMap.get(clients.get(hostName)[i]))) {
-            ++freeNum;
-          }
-        }
+      synchronized (countsMap) {
+        int freeNum = countsMap.get(hostName);
         if (freeNum > maxNum) {
           maxNum = freeNum;
           result = hostName;
+        }
+      }
+    }
+    if (maxNum == -1) {
+      for (String hostName: arrayList) {
+        synchronized (countsMap) {
+          int freeNum = countsMap.get(hostName);
+          if (freeNum > maxNum) {
+            maxNum = freeNum;
+            result = hostName;
+          }
         }
       }
       if (maxNum == -1) {
@@ -87,6 +84,9 @@ public class Master {
         return result;
       }
     } else {
+      synchronized (countsMap) {
+        countsMap.put(result, countsMap.get(result) - 1);
+      }
       return result;
     }
   }
@@ -111,6 +111,9 @@ public class Master {
         }
         synchronized (lock) {
           availableMap.put(clients.get(hostName)[index], true);
+        }
+        synchronized (countsMap) {
+          countsMap.put(hostName, countsMap.get(hostName) + 1);
         }
         return reply;
       } else {
