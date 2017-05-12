@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by lzb on 4/16/17.
@@ -54,8 +55,8 @@ public class App {
     int total = 2500000;
     int cnt = 0;
     for (int i = 0; i < total; ++i) {
-      double x = Math.random();
-      double y = Math.random();
+      double x = ThreadLocalRandom.current().nextDouble(1);
+      double y = ThreadLocalRandom.current().nextDouble(1);
       if (x * x + y * y < 1) {
         ++cnt;
       }
