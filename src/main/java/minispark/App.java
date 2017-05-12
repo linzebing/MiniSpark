@@ -68,7 +68,7 @@ public class App {
   }
 
   public static void SparkPi() throws IOException, TException {
-    int NUM_SAMPLES = 20;
+    int NUM_SAMPLES = 200;
     SparkContext sc = new SparkContext("SparkPi");
     ArrayList<String> l = new ArrayList<>(NUM_SAMPLES);
     for (int i = 0; i < NUM_SAMPLES; ++i) {

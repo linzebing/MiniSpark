@@ -34,7 +34,7 @@ public class Scheduler {
         args.workerOpType = WorkerOpType.ParaJob;
         args.partitionId = partition.partitionId;
         int size = targetRdd.partitions.size();
-        args.inputHostNames = targetRdd.paraArr.subList(index * ((targetRdd.paraArr.size() + size - 1) / size), Math.min(targetRdd.paraArr.size(), (index + 1) * ((targetRdd.paraArr.size() + size - 1) / size)));
+        args.inputHostNames = targetRdd.paraArr.subList(Math.min(targetRdd.paraArr.size(), index * ((targetRdd.paraArr.size() + size - 1) / size)), Math.min(targetRdd.paraArr.size(), (index + 1) * ((targetRdd.paraArr.size() + size - 1) / size)));
         targetRdd.partitions.get(index).hostName = master.findLeastLoaded(Arrays.asList(Master.workerDNSs));
         break;
       case HdfsFile:
