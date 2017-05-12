@@ -25,7 +25,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
       double initVal = values.get(0);
       for (int i = 1; i < values.size(); ++i) {
         try {
-          initVal = (int) method.invoke(null, initVal, values.get(i));
+          initVal = (double) method.invoke(null, initVal, values.get(i));
         } catch (Exception e) {
           e.printStackTrace();
         }
