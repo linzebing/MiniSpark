@@ -1,1 +1,0 @@
-sc.textFile("/test.txt").flatMap(s => s.split(" ")).map(s => s.toLowerCase()).filter(s => s.startsWith("15618") || s.endsWith("15618")).map(s => (s, 1)).reduceByKey(_ + _).collect()
