@@ -43,7 +43,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
   public DoJobReply doJob(List<DoJobArgs> argsArr) throws TException {
     DoJobReply reply = new DoJobReply();
     DoJobArgs args = argsArr.get(argsArr.size() - 1);
-    Long start = System.currentTimeMillis();
     if (argsArr.size() == 1) {
       switch (args.workerOpType) {
         case HashSplit:
@@ -281,10 +280,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
       assert false;
     }
 
-    Long end = System.currentTimeMillis();
-    System.out.println("Get init input used time: " + (end - start) / 1000);
-    Long start1 = System.currentTimeMillis();
-
     ArrayList<String> strResult = new ArrayList<>();
     ArrayList<StringIntPair> pairResult = new ArrayList<>();
     ArrayList<String> flatStrs = null;
@@ -446,9 +441,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     } else {
       hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, pairResult);
     }
-
-    Long end1 = System.currentTimeMillis();
-    System.out.println("Transformtion Used time: " + (end1 - start1) / 1000);
 
     return reply;
   }
