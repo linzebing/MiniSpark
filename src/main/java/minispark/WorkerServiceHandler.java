@@ -315,7 +315,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
       boolean preserve = true;
       for (; i < argsArr.size(); ++i) {
         Method method = methods[i];
-        switch (args.workerOpType) {
+        switch (argsArr.get(i).workerOpType) {
           case MapJob:
             try {
               strTmp = (String) method.invoke(null, strTmp);
@@ -387,7 +387,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           int index = i;
           for (; index < argsArr.size(); ++index) {
             Method method = methods[index];
-            switch (args.workerOpType) {
+            switch (argsArr.get(index).workerOpType) {
               case MapJob:
                 try {
                   strTmp = (String) method.invoke(null, strTmp);
