@@ -149,7 +149,14 @@ public class Scheduler {
     // Because MiniSpark doesn't support opeartors like join that involves multiple RDDs, therefore
     // we omit building a DAG here.
     if (targetRdd.dependencyType == Common.DependencyType.Wide) {
+      Long start = System.currentTimeMillis();
+
       runRddInStage(targetRdd.parentRdd); // Wide dependency, have to materialize parent RDD first
+
+      Long end = System.currentTimeMillis();
+
+      System.out.println("materialize used " + (end - start) / 1000 + "s");
+
       int prevNumPartitions = targetRdd.parentRdd.numPartitions;
       shufflePartitions = new Partition[prevNumPartitions][targetRdd.numPartitions];
       for (int i = 0; i < prevNumPartitions; ++i) {
@@ -166,6 +173,10 @@ public class Scheduler {
         DoJobArgs args = new DoJobArgs(WorkerOpType.HashSplit,  -1, parentPartition.partitionId, -1, "", targetRdd.function, shufflePartitionIds, null, null);
         this.master.assignJob(parentPartition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
       }
+
+      Long end2 = System.currentTimeMillis();
+      System.out.println("HashSplit used " + (end2 - end) / 1000 + "s");
+
       // TODO: execute ReduceByKey directly
       Thread[] threads = new Thread[targetRdd.numPartitions];
       for (int i = 0; i < targetRdd.numPartitions; ++i) {
@@ -188,6 +199,10 @@ public class Scheduler {
           e.printStackTrace();
         }
       }
+
+      Long end3 = System.currentTimeMillis();
+      System.out.println("ReduceByKey used " + (end3 - end2) / 1000 + "s");
+
     } else {
       runRddInStage(targetRdd);
     }
@@ -207,6 +222,7 @@ public class Scheduler {
         }
         return result;
       case PairCollect:
+        Long start = System.currentTimeMillis();
         ArrayList<StringIntPair> pairResult = new ArrayList<StringIntPair>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
@@ -215,6 +231,8 @@ public class Scheduler {
           DoJobReply reply = this.master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
           pairResult.addAll(reply.pairs);
         }
+        Long end = System.currentTimeMillis();
+        System.out.println("PairCollect used " + (end - start) / 1000 + "s");
         return pairResult;
       case Reduce:
         ArrayList<Integer> reduceResults = new ArrayList<>();
