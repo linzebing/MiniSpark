@@ -213,7 +213,7 @@ public class Scheduler {
     }
   }
 
-  public Object computeRdd(Rdd rdd, Common.OperationType operationType, String function) throws TException, IOException {
+  public Object computeRdd(final Rdd rdd, Common.OperationType operationType, final String function) throws TException, IOException {
     computeRddByStage(rdd);
     switch (operationType) {
       case Collect:
@@ -237,22 +237,42 @@ public class Scheduler {
         }
         return pairResult;
       case Reduce:
-        ArrayList<Double> reduceResults = new ArrayList<>();
+        Thread[] threads = new Thread[rdd.numPartitions];
+        final Double[] reduceResults = new Double[rdd.numPartitions];
         for (int i = 0; i < rdd.numPartitions; ++i) {
-          Partition partition = rdd.partitions.get(i);
-          DoJobArgs args = new DoJobArgs();
-          args.funcName = function;
-          args.partitionId = partition.partitionId;
-          args.workerOpType = WorkerOpType.ReduceJob;
-          DoJobReply reply = this.master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
-          reduceResults.add(reply.reduceResult);
+          final int index = i;
+          threads[i] = new Thread(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                Partition partition = rdd.partitions.get(index);
+                DoJobArgs args = new DoJobArgs();
+                args.funcName = function;
+                args.partitionId = partition.partitionId;
+                args.workerOpType = WorkerOpType.ReduceJob;
+                DoJobReply reply = master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
+                reduceResults[index] = reply.reduceResult;
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+            }
+          });
+          threads[i].start();
         }
-        double reduceResult = reduceResults.get(0);
-        for (int i = 1; i < reduceResults.size(); ++i) {
-          System.out.println(reduceResults.get(i));
+        for (int i = 0; i < rdd.numPartitions; ++i) {
+          try {
+            threads[i].join();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+
+        double reduceResult = reduceResults[0];
+        for (int i = 1; i < reduceResults.length; ++i) {
+          System.out.println(reduceResults[i]);
           try {
             Method method = App.class.getMethod(function, double.class, double.class);
-            reduceResult = (double) method.invoke(null, reduceResult, reduceResults.get(i));
+            reduceResult = (double) method.invoke(null, reduceResult, reduceResults[i]);
           } catch (Exception e) {
             e.printStackTrace();
           }
