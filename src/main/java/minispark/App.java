@@ -84,6 +84,7 @@ public class App {
 
 
   public static void main(String[] args) throws IOException, TException {
-    SparkPi();
+    //SparkPi();
+    Histogram();
   }
 }

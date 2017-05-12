@@ -269,7 +269,6 @@ public class Scheduler {
 
         double reduceResult = reduceResults[0];
         for (int i = 1; i < reduceResults.length; ++i) {
-          System.out.println(reduceResults[i]);
           try {
             Method method = App.class.getMethod(function, double.class, double.class);
             reduceResult = (double) method.invoke(null, reduceResult, reduceResults[i]);
