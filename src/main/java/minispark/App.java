@@ -32,7 +32,7 @@ public class App {
 
   public static void WordCount() throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
-    Rdd lines = sc.textFile("webhdfs://ec2-52-3-234-138.compute-1.amazonaws.com/test.txt")
+    Rdd lines = sc.textFile("webhdfs://ec2-34-200-224-104.compute-1.amazonaws.com/test.txt")
         .flatMap("flatMapTest").map("toLower").filter("contains15618")
         .mapPair("mapCount").reduceByKey("add");
     Long start = System.currentTimeMillis();
