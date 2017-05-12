@@ -54,7 +54,7 @@ public class App {
 
   /******* SparkPi begins *******/
   public static StringNumPair monteCarlo(String s) {
-    int total = 10000;
+    int total = 10;
     int cnt = 0;
     for (int i = 0; i < total; ++i) {
       double x = Math.random();
@@ -63,11 +63,12 @@ public class App {
         ++cnt;
       }
     }
+    System.out.println(cnt);
     return new StringNumPair(s, 4.0 * cnt / total);
   }
 
   public static void SparkPi() throws IOException, TException {
-    int NUM_SAMPLES = 2000;
+    int NUM_SAMPLES = 20;
     SparkContext sc = new SparkContext("SparkPi");
     ArrayList<String> l = new ArrayList<>(NUM_SAMPLES);
     for (int i = 0; i < NUM_SAMPLES; ++i) {

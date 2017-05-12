@@ -83,7 +83,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             for (int i = 1; i < tmp.size(); ++i) {
               try {
                 Method method = App.class.getMethod(args.funcName, double.class, double.class);
-                method.invoke(null, reply.reduceResult, tmp.get(i).num);
+                reply.reduceResult = (double) method.invoke(null, reply.reduceResult, tmp.get(i).num);
               } catch (Exception e) {
                 e.printStackTrace();
               }
