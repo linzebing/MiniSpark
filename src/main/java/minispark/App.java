@@ -70,6 +70,9 @@ public class App {
     int NUM_SAMPLES = 2000;
     SparkContext sc = new SparkContext("SparkPi");
     ArrayList<String> l = new ArrayList<>(NUM_SAMPLES);
+    for (int i = 0; i < NUM_SAMPLES; ++i) {
+      l.add(String.valueOf(i));
+    }
     Long start = System.currentTimeMillis();
     double sum = sc.parallelize(l).mapPair("monteCarlo").reduce("add");
     Long end = System.currentTimeMillis();

@@ -250,8 +250,8 @@ public class Scheduler {
         double reduceResult = reduceResults.get(0);
         for (int i = 1; i < reduceResults.size(); ++i) {
           try {
-            Method method = App.class.getMethod(function, String.class);
-            reduceResult = (int) method.invoke(null, int.class, int.class);
+            Method method = App.class.getMethod(function, double.class, double.class);
+            reduceResult = (int) method.invoke(null, reduceResult, reduceResults.get(i));
           } catch (Exception e) {
             e.printStackTrace();
           }
