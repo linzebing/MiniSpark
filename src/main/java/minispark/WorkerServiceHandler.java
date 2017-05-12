@@ -436,6 +436,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
       }
     }
+    System.out.println("size " + strResult.size());
     if (!strResult.isEmpty()) {
       hashMap.put(argsArr.get(argsArr.size() - 1).partitionId, strResult);
     } else {
