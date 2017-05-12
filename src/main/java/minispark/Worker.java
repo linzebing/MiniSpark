@@ -27,11 +27,11 @@ public class Worker {
   public static HashMap<String, WorkerService.Client> clients;
 
   public static String[] workerDNSs = {
-      "ip-172-31-76-230.ec2.internal",
-      "ip-172-31-74-191.ec2.internal",
-      "ip-172-31-67-90.ec2.internal",
-      "ip-172-31-73-101.ec2.internal",
-      "ip-172-31-76-192.ec2.internal",
+      "ip-172-31-79-129.ec2.internal",
+      "ip-172-31-72-39.ec2.internal",
+      "ip-172-31-64-23.ec2.internal",
+      "ip-172-31-70-10.ec2.internal",
+      "ip-172-31-67-185.ec2.internal",
   };
 
   public static WorkerServiceHandler handler;
