@@ -26,7 +26,7 @@ public class Master {
   HashMap<WorkerService.Client, Boolean> availableMap;
   HashMap<String, Integer> countsMap;
   public static final int numClientsPerWorker = 4;
-  public static final int numWorkers = 2;
+  public static final int numWorkers = 6;
   public static final int sleepTime = 100;
   public static final Object lock = new Object();
 
