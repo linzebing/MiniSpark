@@ -51,7 +51,7 @@ public class App {
 
   /******* SparkPi begins *******/
   public static StringNumPair monteCarlo(String s) {
-    int total = 25000000;
+    int total = 2500000;
     int cnt = 0;
     for (int i = 0; i < total; ++i) {
       double x = Math.random();
