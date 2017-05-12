@@ -26,14 +26,15 @@ public class App {
     return a + b;
   }
 
-  public static boolean InstagramOnly(String s) {
+  public static boolean contains15618(String s) {
     return s.endsWith("15618") || s.startsWith("15618");
   }
 
   public static void WordCount() throws IOException, TException {
     SparkContext sc = new SparkContext("Example");
-    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
-        .map("toLower").filter("InstagramOnly").mapPair("mapCount").reduceByKey("add");
+    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt")
+        .flatMap("flatMapTest").map("toLower").filter("contains15618")
+        .mapPair("mapCount").reduceByKey("add");
     Long start = System.currentTimeMillis();
     List<StringNumPair> output = (List<StringNumPair>) lines.collect();
     for (StringNumPair pair: output) {
@@ -47,7 +48,6 @@ public class App {
   public static StringNumPair mapCount(String s) {
     return new StringNumPair(s, 1);
   }
-
   /******* WordCount ends *******/
 
   /******* SparkPi begins *******/

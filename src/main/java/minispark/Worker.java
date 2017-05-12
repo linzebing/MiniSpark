@@ -24,14 +24,15 @@ import tutorial.WorkerService;
  * Created by lzb on 5/4/17.
  */
 public class Worker {
-
-  public static String masterDNS = "ip-172-31-67-73.ec2.internal";
-
   public static HashMap<String, WorkerService.Client> clients;
 
   public static String[] workerDNSs = {
-      "ip-172-31-38-195.ec2.internal",
-      "ip-172-31-40-15.ec2.internal"
+      "ip-172-31-76-230.ec2.internal",
+      "ip-172-31-74-191.ec2.internal",
+      "ip-172-31-67-90.ec2.internal",
+      "ip-172-31-73-101.ec2.internal",
+      "ip-172-31-76-192.ec2.internal",
+      "ip-172-31-79-187.ec2.internal"
   };
 
   public static WorkerServiceHandler handler;
@@ -48,7 +49,7 @@ public class Worker {
     };
 
     new Thread(simple).start();
-    Thread.sleep(5000);
+    Thread.sleep(20000);
 
     for (String workerDNS: workerDNSs) {
       TTransport transport = new TSocket(workerDNS, 9090);
