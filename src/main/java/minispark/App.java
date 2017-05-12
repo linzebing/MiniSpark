@@ -52,7 +52,7 @@ public class App {
 
   /******* SparkPi begins *******/
   public static StringNumPair monteCarlo(String s) {
-    int total = 2500000;
+    int total = 250000000;
     int cnt = 0;
     for (int i = 0; i < total; ++i) {
       double x = ThreadLocalRandom.current().nextDouble(1);
