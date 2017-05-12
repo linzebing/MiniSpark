@@ -110,8 +110,8 @@ public class Rdd {
     return (int) this.sparkContext.scheduler.computeRdd(this, OperationType.Count, null);
   }
 
-  public int reduce(String _function) throws IOException, TException {
-    return (int) this.sparkContext.scheduler.computeRdd(this, OperationType.Reduce, _function);
+  public double reduce(String _function) throws IOException, TException {
+    return (double)this.sparkContext.scheduler.computeRdd(this, OperationType.Reduce, _function);
   }
 
   public Object collect() throws IOException, TException {

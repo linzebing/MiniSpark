@@ -227,7 +227,7 @@ public class Scheduler {
         }
         return result;
       case PairCollect:
-        ArrayList<StringIntPair> pairResult = new ArrayList<StringIntPair>();
+        ArrayList<StringNumPair> pairResult = new ArrayList<StringNumPair>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
           DoJobArgs args = new DoJobArgs(WorkerOpType.GetPairSplit, partition.partitionId, -1, -1, "", "", null, null, null);
@@ -237,7 +237,7 @@ public class Scheduler {
         }
         return pairResult;
       case Reduce:
-        ArrayList<Integer> reduceResults = new ArrayList<>();
+        ArrayList<Double> reduceResults = new ArrayList<>();
         for (int i = 0; i < rdd.numPartitions; ++i) {
           Partition partition = rdd.partitions.get(i);
           DoJobArgs args = new DoJobArgs();
@@ -247,7 +247,7 @@ public class Scheduler {
           DoJobReply reply = this.master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
           reduceResults.add(reply.reduceResult);
         }
-        int reduceResult = reduceResults.get(0);
+        double reduceResult = reduceResults.get(0);
         for (int i = 1; i < reduceResults.size(); ++i) {
           try {
             Method method = App.class.getMethod(function, String.class);
