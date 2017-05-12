@@ -32,7 +32,6 @@ public class Worker {
       "ip-172-31-67-90.ec2.internal",
       "ip-172-31-73-101.ec2.internal",
       "ip-172-31-76-192.ec2.internal",
-      "ip-172-31-79-187.ec2.internal"
   };
 
   public static WorkerServiceHandler handler;

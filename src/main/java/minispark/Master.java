@@ -22,23 +22,21 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Master {
-  HashMap<String, WorkerService.Client[]> clients;
-  HashMap<WorkerService.Client, Boolean> availableMap;
-  HashMap<String, Integer> countsMap;
-  public static final int numClientsPerWorker = 4;
-  public static final int numWorkers = 6;
-  public static final int sleepTime = 100;
-  public static final Object lock = new Object();
-
   public static String[] workerDNSs = {
       "ip-172-31-76-230.ec2.internal",
       "ip-172-31-74-191.ec2.internal",
       "ip-172-31-67-90.ec2.internal",
       "ip-172-31-73-101.ec2.internal",
       "ip-172-31-76-192.ec2.internal",
-      "ip-172-31-79-187.ec2.internal"
   };
 
+  HashMap<String, WorkerService.Client[]> clients;
+  HashMap<WorkerService.Client, Boolean> availableMap;
+  HashMap<String, Integer> countsMap;
+  public static final int numClientsPerWorker = 4;
+  public static final int numWorkers = workerDNSs.length;
+  public static final int sleepTime = 100;
+  public static final Object lock = new Object();
 
   public Master() {
     try {
