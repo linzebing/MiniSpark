@@ -250,9 +250,7 @@ public class Scheduler {
                 args.funcName = function;
                 args.partitionId = partition.partitionId;
                 args.workerOpType = WorkerOpType.ReduceJob;
-                System.out.println("Assigned " + index);
                 DoJobReply reply = master.assignJob(partition.hostName, new ArrayList<DoJobArgs>(Arrays. asList(args)));
-                System.out.println("Done " + index);
                 reduceResults[index] = reply.reduceResult;
               } catch (Exception e) {
                 e.printStackTrace();
