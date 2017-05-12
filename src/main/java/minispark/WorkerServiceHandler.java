@@ -17,12 +17,12 @@ import java.util.Map;
 public class WorkerServiceHandler implements WorkerService.Iface {
   public static HashMap<Integer, Object> hashMap = new HashMap<Integer, Object>();
 
-  public static int reduceHelper(Method method, ArrayList<Integer> values) {
+  public static double reduceHelper(Method method, ArrayList<Double> values) {
     assert !values.isEmpty();
     if (values.size() == 1) {
       return values.get(0);
     } else {
-      int initVal = values.get(0);
+      double initVal = values.get(0);
       for (int i = 1; i < values.size(); ++i) {
         try {
           initVal = (int) method.invoke(null, initVal, values.get(i));
@@ -34,10 +34,10 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     }
   }
 
-  public ArrayList<StringIntPair> readPartition(int partitionId) {
+  public ArrayList<StringNumPair> readPartition(int partitionId) {
     System.out.println("Received readPartition");
     assert hashMap.containsKey(partitionId);
-    return (ArrayList<StringIntPair>) hashMap.get(partitionId);
+    return (ArrayList<StringNumPair>) hashMap.get(partitionId);
   }
 
   public DoJobReply doJob(List<DoJobArgs> argsArr) throws TException {
@@ -60,11 +60,11 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             // Already in memory
             break;
           }
-          ArrayList<StringIntPair>[] hashedResults = new ArrayList[size];
+          ArrayList<StringNumPair>[] hashedResults = new ArrayList[size];
           for (int i = 0; i < size; ++i) {
             hashedResults[i] = new ArrayList<>();
           }
-          for (StringIntPair pair : (ArrayList<StringIntPair>) hashMap.get(args.inputId)) {
+          for (StringNumPair pair : (ArrayList<StringNumPair>) hashMap.get(args.inputId)) {
             hashedResults[Math.abs(pair.str.hashCode()) % size].add(pair);
           }
           for (int i = 0; i < size; ++i) {
@@ -78,11 +78,11 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             // Output doesn't exist?
             System.out.println("Reduce on non-materialized data");
           } else {
-            ArrayList<StringIntPair> tmp = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+            ArrayList<StringNumPair> tmp = (ArrayList<StringNumPair>) hashMap.get(args.partitionId);
             reply.reduceResult = tmp.get(0).num;
             for (int i = 1; i < tmp.size(); ++i) {
               try {
-                Method method = App.class.getMethod(args.funcName, int.class, int.class);
+                Method method = App.class.getMethod(args.funcName, double.class, double.class);
                 method.invoke(null, reply.reduceResult, tmp.get(i).num);
               } catch (Exception e) {
                 e.printStackTrace();
@@ -96,7 +96,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             // Output doesn't exist?
             System.out.println("CountPair on non-materialized data");
           } else {
-            reply.reduceResult = ((ArrayList<StringIntPair>) hashMap.get(args.partitionId)).size();
+            reply.reduceResult = ((ArrayList<StringNumPair>) hashMap.get(args.partitionId)).size();
           }
           return reply;
         case CountJob:
@@ -114,22 +114,22 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           if (hashMap.containsKey(args.partitionId)) {
             // Output already exists
           } else {
-            ArrayList<StringIntPair> lines = Worker.readPartitions(args.inputIds, args.inputHostNames);
-            HashMap<String, ArrayList<Integer>> kvStore = new HashMap<>();
-            for (StringIntPair pair : lines) {
+            ArrayList<StringNumPair> lines = Worker.readPartitions(args.inputIds, args.inputHostNames);
+            HashMap<String, ArrayList<Double>> kvStore = new HashMap<>();
+            for (StringNumPair pair : lines) {
               if (kvStore.containsKey(pair.str)) {
                 kvStore.get(pair.str).add(pair.num);
               } else {
-                ArrayList<Integer> arrayList = new ArrayList<>();
+                ArrayList<Double> arrayList = new ArrayList<>();
                 arrayList.add(pair.num);
                 kvStore.put(pair.str, arrayList);
               }
             }
-            ArrayList<StringIntPair> output = new ArrayList<>();
+            ArrayList<StringNumPair> output = new ArrayList<>();
             try {
-              Method method = App.class.getMethod(args.funcName, int.class, int.class);
-              for (Map.Entry<String, ArrayList<Integer>> entry : kvStore.entrySet()) {
-                output.add(new StringIntPair(entry.getKey(), reduceHelper(method, entry.getValue())));
+              Method method = App.class.getMethod(args.funcName, double.class, double.class);
+              for (Map.Entry<String, ArrayList<Double>> entry : kvStore.entrySet()) {
+                output.add(new StringNumPair(entry.getKey(), reduceHelper(method, entry.getValue())));
               }
             } catch (Exception e) {
               e.printStackTrace();
@@ -148,7 +148,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         case GetPairSplit:
           System.out.println("Received GetPairSplit");
           if (hashMap.containsKey(args.partitionId)) {
-            reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+            reply.pairs = (ArrayList<StringNumPair>) hashMap.get(args.partitionId);
           } else {
             System.out.println("GetPairSplit Exception");
           }
@@ -175,14 +175,14 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         case MapPairJob:
           System.out.println("Received MapPairJob");
           if (hashMap.containsKey(args.partitionId)) {
-            // reply.pairs = (ArrayList<StringIntPair>) hashMap.get(args.partitionId);
+            // reply.pairs = (ArrayList<StringNumPair>) hashMap.get(args.partitionId);
           } else {
             try {
               Method method = App.class.getMethod(args.funcName, String.class);
               ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
-              ArrayList<StringIntPair> output = new ArrayList<>();
+              ArrayList<StringNumPair> output = new ArrayList<>();
               for (String str : input) {
-                output.add((StringIntPair) method.invoke(null, str));
+                output.add((StringNumPair) method.invoke(null, str));
               }
               hashMap.put(args.partitionId, output);
               hashMap.remove(args.inputId);
@@ -219,9 +219,9 @@ public class WorkerServiceHandler implements WorkerService.Iface {
           } else {
             try {
               Method method = App.class.getMethod(args.funcName, String.class);
-              ArrayList<StringIntPair> input = (ArrayList<StringIntPair>) hashMap.get(args.inputId);
-              ArrayList<StringIntPair> output = new ArrayList<>();
-              for (StringIntPair str : input) {
+              ArrayList<StringNumPair> input = (ArrayList<StringNumPair>) hashMap.get(args.inputId);
+              ArrayList<StringNumPair> output = new ArrayList<>();
+              for (StringNumPair str : input) {
                 if ((boolean) method.invoke(null, str)) {
                   output.add(str);
                 }
@@ -281,7 +281,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     }
 
     ArrayList<String> strResult = new ArrayList<>();
-    ArrayList<StringIntPair> pairResult = new ArrayList<>();
+    ArrayList<StringNumPair> pairResult = new ArrayList<>();
     ArrayList<String> flatStrs = null;
 
     Method[] methods = new Method[argsArr.size()];
@@ -290,7 +290,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
       args = argsArr.get(i);
       if (args.workerOpType == WorkerOpType.FilterPairJob) {
         try {
-          methods[i] = App.class.getMethod(args.funcName, StringIntPair.class);
+          methods[i] = App.class.getMethod(args.funcName, StringNumPair.class);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -304,7 +304,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
     }
 
     for (String strTmp : starter) {
-      StringIntPair pairTmp = null;
+      StringNumPair pairTmp = null;
       int i = 1;
       boolean flatMapped = false;
       boolean preserve = true;
@@ -320,7 +320,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
             break;
           case MapPairJob:
             try {
-              pairTmp = (StringIntPair) method.invoke(null, strTmp);
+              pairTmp = (StringNumPair) method.invoke(null, strTmp);
             } catch (Exception e) {
               e.printStackTrace();
             }
@@ -392,7 +392,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 break;
               case MapPairJob:
                 try {
-                  pairTmp = (StringIntPair) method.invoke(null, strTmp);
+                  pairTmp = (StringNumPair) method.invoke(null, strTmp);
                 } catch (Exception e) {
                   e.printStackTrace();
                 }

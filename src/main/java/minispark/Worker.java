@@ -17,7 +17,7 @@ import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.*;
 import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
-import tutorial.StringIntPair;
+import tutorial.StringNumPair;
 import tutorial.WorkerService;
 
 /**
@@ -58,10 +58,10 @@ public class Worker {
     }
   }
 
-  public static ArrayList<StringIntPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
+  public static ArrayList<StringNumPair> readPartitions(List<Integer> inputIds, List<String> inputHostNames) throws TException {
     assert inputIds.size() == inputHostNames.size();
     int size = inputIds.size();
-    ArrayList<StringIntPair> everything = new ArrayList<>();
+    ArrayList<StringNumPair> everything = new ArrayList<>();
     for (int i = 0; i < size; ++i) {
       synchronized (clients.get(inputHostNames.get(i))) {
         everything.addAll(clients.get(inputHostNames.get(i)).readPartition(inputIds.get(i)));

@@ -98,20 +98,20 @@ struct DoJobArgs {
   9: list<string> inputHostNames
 }
 
-struct StringIntPair {
+struct StringNumPair {
    1: string str,
-   2: i32 num
+   2: double num
 }
 
 struct DoJobReply {
    1: list<string> lines,
-   2: list<StringIntPair> pairs,
-   3: i32 reduceResult
+   2: list<StringNumPair> pairs,
+   3: double reduceResult
 }
 
 service WorkerService {
     DoJobReply doJob(1:list<DoJobArgs> doJobArgsArr),
-    list<StringIntPair> readPartition(1:i32 partitionId)
+    list<StringNumPair> readPartition(1:i32 partitionId)
 }
 
 

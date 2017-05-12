@@ -1,7 +1,7 @@
 package minispark;
 
 import org.apache.thrift.TException;
-import tutorial.StringIntPair;
+import tutorial.StringNumPair;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,64 +12,75 @@ import java.util.List;
  * Created by lzb on 4/16/17.
  */
 public class App {
-
-  public static boolean filterTest(String s) {
-    return (s.hashCode() % 2 == 1);
+  /******* Histogram begins *******/
+  public static ArrayList<String> extractLetters(String s) {
+    ArrayList<String> result = new ArrayList<>();
+    for (int i = 0; i < s.length(); ++i) {
+      char ch = s.charAt(i);
+      if ('A' <= ch && ch <= 'Z') {
+        result.add(String.valueOf(ch + ('a' - 'A')));
+      } else if ('a' <= ch && ch <= 'z') {
+        result.add(String.valueOf(ch));
+      }
+    }
+    return result;
   }
 
-  public static String mapTest(String s) {
-    return s.toLowerCase();
-  }
-
-  public static ArrayList<String> flatMapTest(String s) {
-    return new ArrayList<String>(Arrays.asList(s.split(" ")));
-  }
-
-  public static int reduceByKeyTest(int a, int b) {
+  public static double add(double a, double b) {
     return a + b;
   }
 
-  public static StringIntPair mapCount(String s) {
-    return new StringIntPair(s, 1);
+  public static StringNumPair mapCount(String s) {
+    return new StringNumPair(s, 1);
   }
 
-  public static boolean InstagramOnly(String s) {
-    return s.endsWith("15618") || s.startsWith("15618");
-  }
+  public static void Histogram() throws IOException, TException {
+    SparkContext sc = new SparkContext("WordCount");
+    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt")
+        .flatMap("extractLetters")
+        .mapPair("mapCount")
+        .reduceByKey("add");
 
-  public static void wordCount() throws IOException, TException {
-    SparkContext sc = new SparkContext("Example");
-    Rdd lines = sc.textFile("webhdfs://ec2-54-208-160-33.compute-1.amazonaws.com/test.txt").flatMap("flatMapTest")
-        .map("mapTest").filter("InstagramOnly").mapPair("mapCount").reduceByKey("reduceByKeyTest");
     Long start = System.currentTimeMillis();
-    List<StringIntPair> output = (List<StringIntPair>) lines.collect();
-    for (StringIntPair pair: output) {
+    List<StringNumPair> output = (List<StringNumPair>) lines.collect();
+    for (StringNumPair pair: output) {
       System.out.println(pair.str + " " + pair.num);
     }
     Long end = System.currentTimeMillis();
-    System.out.println("Used " + (end - start) / 1000 + " seconds");
+    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
     sc.stop();
   }
+  /******* Histogram ends *******/
 
-  public static boolean monteCarlo(String s) {
-    double x = Math.random();
-    double y = Math.random();
-    return x * x + y * y < 1;
-  }
-
-  public static void calcPi() throws IOException, TException {
-    SparkContext sc = new SparkContext("Example");
-    int NUM_SAMPLES = 20170510;
-    ArrayList<String> l = new ArrayList<>();
-    for (int i = 0; i < NUM_SAMPLES; ++i) {
-      l.add(String.valueOf(i));
+  /******* SparkPi begins *******/
+  public static StringNumPair monteCarlo(String s) {
+    int total = 10000;
+    int cnt = 0;
+    for (int i = 0; i < total; ++i) {
+      double x = Math.random();
+      double y = Math.random();
+      if (x * x + y * y < 1) {
+        ++cnt;
+      }
     }
-    System.out.println("Pi is roughly " + 4.0 * sc.parallelize(l).filter("monteCarlo").count() / NUM_SAMPLES);
+    return new StringNumPair(s, 4.0 * cnt / total);
+  }
+
+  public static void SparkPi() throws IOException, TException {
+    int NUM_SAMPLES = 2000;
+    SparkContext sc = new SparkContext("SparkPi");
+    ArrayList<String> l = new ArrayList<>(NUM_SAMPLES);
+    Long start = System.currentTimeMillis();
+    double sum = sc.parallelize(l).mapPair("monteCarlo").reduce("add");
+    Long end = System.currentTimeMillis();
+    System.out.println("Estimation of pi is: " + sum / NUM_SAMPLES);
+    System.out.println("Time elapsed: " + (end - start) / 1000 + "seconds");
     sc.stop();
   }
+  /******* SparkPi ends *******/
+
 
   public static void main(String[] args) throws IOException, TException {
-    wordCount();
-    //calcPi();
+    SparkPi();
   }
 }
