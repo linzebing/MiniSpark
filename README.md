@@ -3,7 +3,9 @@
 Team member: Zebing Lin (zebingl)
 
 # Summary
-  I implemented a mini Spark-like framework named MiniSpark that can run on top of a HDFS cluster. MiniSpark supports operators including *Map*, *FlatMap*, *MapPair*, *Reduce*, *ReduceByKey*, *Collect*, *Count*, *Parallelize* and *Filter*. The Github repo is [https://github.com/linzebing/MiniSpark](https://github.com/linzebing/MiniSpark).
+  I implemented a mini Spark-like framework named MiniSpark that can run on top of a HDFS cluster. MiniSpark supports operators including *Map*, *FlatMap*, *MapPair*, *Reduce*, *ReduceByKey*, *Collect*, *Count*, *Parallelize*, *Join* and *Filter*. The Github repo is [https://github.com/linzebing/MiniSpark](https://github.com/linzebing/MiniSpark).
+  
+  Rdd fault tolerance and worker fault tolerance are supported.
 
 # Background
 Google's MapReduce has been very successful in implementing large-scale data-intensive applications, however it's

@@ -61,12 +61,7 @@
  * Thrift files can namespace, package, or prefix their output in various
  * target languages.
  */
-namespace cpp tutorial
 namespace java tutorial
-namespace php tutorial
-namespace perl tutorial
-
-
 
 enum WorkerOpType {
   ReadHdfsSplit = 1,
@@ -83,7 +78,8 @@ enum WorkerOpType {
   HashSplit = 12,
   CountPairJob = 13,
   FilterPairJob = 14,
-  ParaJob = 15
+  ParaJob = 15,
+  JoinJob = 16,
 }
 
 struct DoJobArgs {
@@ -95,7 +91,9 @@ struct DoJobArgs {
   6: string funcName,
   7: list<i32> shufflePartitionIds,
   8: list<i32> inputIds,
-  9: list<string> inputHostNames
+  9: list<string> inputHostNames,
+  10: list<i32> inputIds2,
+  11: list<string> inputHostNames2
 }
 
 struct StringNumPair {

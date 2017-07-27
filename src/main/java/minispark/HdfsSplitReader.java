@@ -6,6 +6,8 @@ import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+
 import org.apache.hadoop.fs.FileSystem;
 
 
@@ -14,18 +16,16 @@ import org.apache.hadoop.fs.FileSystem;
  */
 public class HdfsSplitReader {
   public static ArrayList<ArrayList<String>> HdfsGetSplitInfo(String fileName) throws IOException {
-    ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+    ArrayList<ArrayList<String>> result = new ArrayList<>();
     JobConf conf = new JobConf();
     FileInputFormat.setInputPaths(conf, fileName);
     TextInputFormat format = new TextInputFormat();
     format.configure(conf);
     InputSplit[] splits = format.getSplits(conf, 0);
-    for (int i = 0 ; i < splits.length; ++i) {
-      String[] locations = splits[i].getLocations();
+    for (InputSplit split : splits) {
+      String[] locations = split.getLocations();
       ArrayList arrayList = new ArrayList<String>();
-      for (int j = 0; j < locations.length; ++j) {
-        arrayList.add(locations[j]);
-      }
+      Collections.addAll(arrayList, locations);
       result.add(arrayList);
     }
     System.out.println(result);
@@ -34,7 +34,6 @@ public class HdfsSplitReader {
 
   public static ArrayList<String> HdfsSplitRead(String fileName, int index) throws IOException {
     JobConf conf = new JobConf();
-    FileSystem fs = FileSystem.get(conf);
     FileInputFormat.setInputPaths(conf, fileName);
     TextInputFormat format = new TextInputFormat();
     format.configure(conf);
@@ -44,7 +43,7 @@ public class HdfsSplitReader {
     RecordReader<LongWritable, Text> recordReader =
         format.getRecordReader(splits[index], conf, Reporter.NULL);
 
-    ArrayList<String> result = new ArrayList<String>();
+    ArrayList<String> result = new ArrayList<>();
 
     while (recordReader.next(key, value)) {
       result.add(value.toString());
