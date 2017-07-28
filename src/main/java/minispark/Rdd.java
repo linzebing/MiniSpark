@@ -28,32 +28,27 @@ class Partition {
 public class Rdd {
     // By default, use hash partition
 
-    public SparkContext sparkContext;
-
-    public boolean cacheHint;
-
-    public DependencyType dependencyType; // Wide or Narrow
-    public OperationType operationType; // Map, Reduce, FlatMap...
-    public Rdd parentRdd; // Rdd that this current Rdd is derived from
-    public Rdd parentRdd2; // for Join Operations
-    public int numPartitions; // Number of Partitions
-    public String function;
-
-    public boolean isPairRdd;
-
+    public final DependencyType dependencyType; // Wide or Narrow
+    public final OperationType operationType; // Map, Reduce, FlatMap...
+    public final Rdd parentRdd; // Rdd that this current Rdd is derived from
+    public final int numPartitions; // Number of Partitions
+    public final String function;
+    public final boolean isPairRdd;
     /*
       Blocks are physical division and input splits are logical division.
       One input split can be map to multiple physical blocks.
       When Hadoop submits jobs, it splits the input data logically and process by each Mapper task.
      */
-    public ArrayList<ArrayList<String>> hdfsSplitInfo;
-    public String filePath;
-
+    public final ArrayList<ArrayList<String>> hdfsSplitInfo;
+    public final String filePath;
     /*
       By default, RDD is partitioned into numPartions (number of splits in HDFS)
      */
-    public ArrayList<Partition> partitions;
+    public final ArrayList<Partition> partitions;
+    private final SparkContext sparkContext;
+    public Rdd parentRdd2; // for Join Operations
     public ArrayList<String> paraArr;
+    private boolean cacheHint;
 
     public Rdd(SparkContext _sparkContext, DependencyType _dependencyType, OperationType _operationType, Rdd _parentRdd,
             int _numPartitions, final String _function, ArrayList<ArrayList<String>> _hdfsSplitInfo, String _filePath,
@@ -66,7 +61,7 @@ public class Rdd {
         this.function = _function;
         this.hdfsSplitInfo = _hdfsSplitInfo;
         this.filePath = _filePath;
-        this.partitions = new ArrayList<Partition>();
+        this.partitions = new ArrayList<>();
 
         for (int i = 0; i < this.numPartitions; ++i) {
             partitions.add(new Partition(getPartitionId(), ""));

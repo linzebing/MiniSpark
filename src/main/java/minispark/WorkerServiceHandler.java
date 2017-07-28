@@ -19,9 +19,9 @@ import java.util.Map;
 
 
 public class WorkerServiceHandler implements WorkerService.Iface {
-    public static HashMap<Integer, Object> hashMap = new HashMap<Integer, Object>();
+    private static final HashMap<Integer, Object> hashMap = new HashMap<>();
 
-    public static double reduceHelper(Method method, ArrayList<Double> values) {
+    private static double reduceHelper(Method method, ArrayList<Double> values) {
         assert !values.isEmpty();
         if (values.size() == 1) {
             return values.get(0);
@@ -173,10 +173,10 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                             String key = entry.getKey();
                             if (kvStore2.containsKey(key)) {
                                 double sum = 0;
-                                for (double num: entry.getValue()) {
+                                for (double num : entry.getValue()) {
                                     sum += num;
                                 }
-                                for (double num: kvStore2.get(key)) {
+                                for (double num : kvStore2.get(key)) {
                                     sum += num;
                                 }
                                 output.add(new StringNumPair(key, sum));
@@ -269,9 +269,9 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<StringNumPair> input = (ArrayList<StringNumPair>) hashMap.get(args.inputId);
                             ArrayList<StringNumPair> output = new ArrayList<>();
-                            for (StringNumPair str : input) {
-                                if ((boolean) method.invoke(null, str)) {
-                                    output.add(str);
+                            for (StringNumPair stringNumPair : input) {
+                                if ((boolean) method.invoke(null, stringNumPair)) {
+                                    output.add(stringNumPair);
                                 }
                             }
                             hashMap.put(args.partitionId, output);
