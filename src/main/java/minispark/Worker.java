@@ -67,7 +67,6 @@ public class Worker {
     private static void simple(WorkerService.Processor processor) {
         try {
             TServerTransport serverTransport = new TServerSocket(9090);
-            //TServer server = new TSimpleServer(new Args(serverTransport).processor(processor));
 
             // Use this for a multithreaded server
             TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(processor));

@@ -7,10 +7,6 @@
 package tutorial;
 
 
-import java.util.Map;
-import java.util.HashMap;
-import org.apache.thrift.TEnum;
-
 public enum WorkerOpType implements org.apache.thrift.TEnum {
   ReadHdfsSplit(1),
   GetSplit(2),

@@ -38,6 +38,20 @@ public class WorkerServiceHandler implements WorkerService.Iface {
         }
     }
 
+    private static HashMap<String, ArrayList<Double>> constructHashmap(ArrayList<StringNumPair> pairs) {
+        HashMap<String, ArrayList<Double>> kvStore = new HashMap<>();
+        for (StringNumPair pair : pairs) {
+            if (kvStore.containsKey(pair.str)) {
+                kvStore.get(pair.str).add(pair.num);
+            } else {
+                ArrayList<Double> arrayList = new ArrayList<>();
+                arrayList.add(pair.num);
+                kvStore.put(pair.str, arrayList);
+            }
+        }
+        return kvStore;
+    }
+
     public ArrayList<StringNumPair> readPartition(int partitionId) {
         System.out.println("Received readPartition");
         assert hashMap.containsKey(partitionId);
@@ -115,20 +129,9 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                 case ReduceByKeyJob:
                     System.out.println("Received ReduceByKeyJob");
                     assert argsArr.size() == 1;
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // Output already exists
-                    } else {
-                        ArrayList<StringNumPair> lines = Worker.readPartitions(args.inputIds, args.inputHostNames);
-                        HashMap<String, ArrayList<Double>> kvStore = new HashMap<>();
-                        for (StringNumPair pair : lines) {
-                            if (kvStore.containsKey(pair.str)) {
-                                kvStore.get(pair.str).add(pair.num);
-                            } else {
-                                ArrayList<Double> arrayList = new ArrayList<>();
-                                arrayList.add(pair.num);
-                                kvStore.put(pair.str, arrayList);
-                            }
-                        }
+                    if (!hashMap.containsKey(args.partitionId)) {
+                        HashMap<String, ArrayList<Double>> kvStore = constructHashmap(
+                                Worker.readPartitions(args.inputIds, args.inputHostNames));
                         ArrayList<StringNumPair> output = new ArrayList<>();
                         try {
                             Method method = App.class.getMethod(args.funcName, double.class, double.class);
@@ -143,31 +146,11 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case JoinJob:
                     System.out.println("Received JoinJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // Output already exists
-                    } else {
-                        ArrayList<StringNumPair> lines1 = Worker.readPartitions(args.inputIds, args.inputHostNames);
-                        ArrayList<StringNumPair> lines2 = Worker.readPartitions(args.inputIds2, args.inputHostNames2);
-                        HashMap<String, ArrayList<Double>> kvStore1 = new HashMap<>();
-                        HashMap<String, ArrayList<Double>> kvStore2 = new HashMap<>();
-                        for (StringNumPair pair : lines1) {
-                            if (kvStore1.containsKey(pair.str)) {
-                                kvStore1.get(pair.str).add(pair.num);
-                            } else {
-                                ArrayList<Double> arrayList = new ArrayList<>();
-                                arrayList.add(pair.num);
-                                kvStore1.put(pair.str, arrayList);
-                            }
-                        }
-                        for (StringNumPair pair : lines2) {
-                            if (kvStore2.containsKey(pair.str)) {
-                                kvStore2.get(pair.str).add(pair.num);
-                            } else {
-                                ArrayList<Double> arrayList = new ArrayList<>();
-                                arrayList.add(pair.num);
-                                kvStore2.put(pair.str, arrayList);
-                            }
-                        }
+                    if (!hashMap.containsKey(args.partitionId)) {
+                        HashMap<String, ArrayList<Double>> kvStore1 = constructHashmap(
+                                Worker.readPartitions(args.inputIds, args.inputHostNames));
+                        HashMap<String, ArrayList<Double>> kvStore2 = constructHashmap(
+                                Worker.readPartitions(args.inputIds2, args.inputHostNames2));
                         ArrayList<StringNumPair> output = new ArrayList<>();
                         for (Map.Entry<String, ArrayList<Double>> entry : kvStore1.entrySet()) {
                             String key = entry.getKey();
@@ -203,9 +186,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case MapJob:
                     System.out.println("Received MapJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
-                    } else {
+                    if (!hashMap.containsKey(args.partitionId)) {
                         try {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
@@ -222,9 +203,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case MapPairJob:
                     System.out.println("Received MapPairJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // reply.pairs = (ArrayList<StringNumPair>) hashMap.get(args.partitionId);
-                    } else {
+                    if (!hashMap.containsKey(args.partitionId)) {
                         try {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
@@ -241,9 +220,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case FilterJob:
                     System.out.println("Received FilterJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // already exists
-                    } else {
+                    if (!hashMap.containsKey(args.partitionId)) {
                         try {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
@@ -262,9 +239,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case FilterPairJob:
                     System.out.println("Received FilterPairJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // already exists
-                    } else {
+                    if (!hashMap.containsKey(args.partitionId)) {
                         try {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<StringNumPair> input = (ArrayList<StringNumPair>) hashMap.get(args.inputId);
@@ -283,9 +258,7 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     return reply;
                 case FlatMapJob:
                     System.out.println("Received FlatMapJob");
-                    if (hashMap.containsKey(args.partitionId)) {
-                        // reply.lines = (ArrayList<String>) hashMap.get(args.partitionId);
-                    } else {
+                    if (!hashMap.containsKey(args.partitionId)) {
                         try {
                             Method method = App.class.getMethod(args.funcName, String.class);
                             ArrayList<String> input = (ArrayList<String>) hashMap.get(args.inputId);
@@ -308,9 +281,6 @@ public class WorkerServiceHandler implements WorkerService.Iface {
                     assert false;
             }
         }
-
-        // TODO: assume no caching here, always start from ParaJob or ReadHdfsSplit
-        // TODO: Should detect the latest partition that is in memory and start from there
 
         List<String> starter = null;
         args = argsArr.get(0);

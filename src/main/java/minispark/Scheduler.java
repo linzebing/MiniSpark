@@ -191,8 +191,6 @@ public class Scheduler {
     }
 
     private void computeRddByStage(final Rdd targetRdd) throws IOException, TException {
-        // Because MiniSpark doesn't support operators like join that involves multiple RDDs, therefore
-        // we omit building a DAG here.
         if (targetRdd.dependencyType == Common.DependencyType.Wide) {
             runRddInStage(targetRdd.parentRdd); // Wide dependency, have to materialize parent RDD first
 
